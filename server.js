@@ -112,16 +112,24 @@ app.get('/api/test', (req, res) => {
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
   try {
-    app.use(express.static(path.join(__dirname, 'frontend/build')));
+    // Serve static files from the public directory (created by build script)
+    app.use(express.static(path.join(__dirname, 'public')));
     
     // Handle React routing, return all requests to React app
     app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+      res.sendFile(path.join(__dirname, 'public', 'index.html'));
     });
   } catch (error) {
     console.log('Static files not available:', error.message);
     app.get('*', (req, res) => {
-      res.json({ message: 'Frontend build not available' });
+      res.json({ 
+        message: 'Frontend build not available',
+        error: error.message,
+        api: {
+          health: '/api/health',
+          test: '/api/test'
+        }
+      });
     });
   }
 } else {
@@ -151,26 +159,24 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-// Only start server if not in serverless environment
-if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 AI Study Buddy server running on port ${PORT}`);
-    console.log(`📅 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🗄️ Database: Disabled`);
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`🌐 Frontend: http://localhost:3000`);
-      console.log(`🔧 API: http://localhost:${PORT}/api`);
-    }
-  });
+// Start server
+const server = app.listen(PORT, () => {
+  console.log(`🚀 AI Study Buddy server running on port ${PORT}`);
+  console.log(`📅 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🗄️ Database: Disabled`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🌐 Frontend: http://localhost:3000`);
+    console.log(`🔧 API: http://localhost:${PORT}/api`);
+  }
+});
 
-  // Graceful shutdown
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server');
-    server.close(() => {
-      console.log('HTTP server closed');
-      process.exit(0);
-    });
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
   });
-}
+});
 
 module.exports = app; 

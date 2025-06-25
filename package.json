@@ -11,8 +11,7 @@
     "test": "jest",
     "build": "cd frontend && npm install && npm run build",
     "build:prod": "npm run build && node server.js",
-    "heroku-postbuild": "cd frontend && npm install && npm run build",
-    "vercel-build": "./build.sh"
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "keywords": [
     "ai",

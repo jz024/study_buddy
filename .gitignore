@@ -148,3 +148,4 @@ backend/uploads/*
 # Build files
 frontend/build/
 dist/ 
+.vercel
