@@ -37,11 +37,7 @@ Fill in these settings:
 - **Branch**: `main`
 
 **Build & Deploy Settings:**
-- **Build Command**: Try these options in order:
-  1. `npm run render-build-robust` (most reliable - creates files if missing)
-  2. `npm run render-build-alt` (uses --prefix)
-  3. `npm run render-build-simple` (uses bash script)
-  4. `npm run render-build` (original npm script)
+- **Build Command**: `npm run render-build`
 - **Start Command**: `npm start`
 - **Auto-Deploy**: ✅ Yes
 
@@ -96,9 +92,9 @@ REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89
 
 1. **"Could not find a required file. Name: index.html" Error**
    - This means React can't find the index.html in the public directory
-   - **Solution 1**: Use `npm run render-build-alt` (uses --prefix flag)
-   - **Solution 2**: Use `npm run render-build-simple` (bash script with better error handling)
-   - **Solution 3**: Check if frontend/public/index.html exists in your repository
+   - **Solution**: The build script should create the public directory and files automatically
+   - Check build logs to see if the copy command worked
+   - Verify the build script has proper permissions
 
 2. **Build Fails**
    - Check build logs in Render dashboard
@@ -107,8 +103,7 @@ REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89
 
 3. **"index.html not found" Error**
    - This means the build script didn't create the public directory properly
-   - **Solution**: Try the alternative build commands above
-   - Check build logs to see if the copy command worked
+   - **Solution**: Check build logs for specific error messages
    - Verify the build script has proper permissions
 
 4. **Firebase Errors**
@@ -123,13 +118,7 @@ REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89
 
 ### Debug Commands:
 ```bash
-# Test the alternative build script (recommended)
-npm run render-build-alt
-
-# Test the simple build script
-npm run render-build-simple
-
-# Test the original build script
+# Test the build script locally
 npm run render-build
 
 # Test server locally
@@ -140,11 +129,9 @@ echo $REACT_APP_FIREBASE_API_KEY
 ```
 
 ### If Build Script Fails:
-1. **Try the alternative script**: Change build command to `npm run render-build-alt`
-2. **Check file permissions**: Make sure build scripts are executable
-3. **Check build logs**: Look for specific error messages
-4. **Verify directory structure**: Ensure frontend/public/index.html exists
-5. **Try bash script**: Use `npm run render-build-simple` instead
+1. **Check build logs**: Look for specific error messages
+2. **Verify file permissions**: Make sure build-robust.sh is executable
+3. **Check directory structure**: Ensure frontend/public/index.html exists
 
 ## Advantages of Render over Vercel
 
