@@ -5,13 +5,18 @@ echo "🚀 Building AI Study Buddy for Render..."
 # Navigate to frontend directory
 cd frontend
 
-# Install dependencies
+# Install dependencies (including dev dependencies)
 echo "📦 Installing frontend dependencies..."
-npm install
+npm install --production=false
 
 # Install react-scripts explicitly
 echo "🔧 Installing react-scripts..."
 npm install react-scripts@5.0.1
+
+# Check if public directory and index.html exist
+echo "🔍 Checking public directory..."
+ls -la public/
+echo "✅ index.html exists: $(test -f public/index.html && echo 'YES' || echo 'NO')"
 
 # Build the frontend with environment variables explicitly set
 echo "🏗️ Building frontend..."
@@ -22,6 +27,12 @@ REACT_APP_FIREBASE_STORAGE_BUCKET="studybuddy-778f8.firebasestorage.app" \
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID="733206808364" \
 REACT_APP_FIREBASE_APP_ID="1:733206808364:web:e325f8833192a502f9ce89" \
 npm run build
+
+# Check if build was successful
+if [ ! -d "build" ]; then
+    echo "❌ Build failed - build directory not found"
+    exit 1
+fi
 
 # Go back to root directory
 cd ..
