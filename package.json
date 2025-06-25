@@ -14,7 +14,8 @@
     "heroku-postbuild": "cd frontend && npm install && npm run build",
     "render-build": "cd frontend && npm install --production=false && npm install react-scripts@5.0.1 && REACT_APP_FIREBASE_API_KEY=AIzaSyAz4KaboNV1JnIfzTNmmXvfZuDEcziqWMo REACT_APP_FIREBASE_AUTH_DOMAIN=studybuddy-778f8.firebaseapp.com REACT_APP_FIREBASE_PROJECT_ID=studybuddy-778f8 REACT_APP_FIREBASE_STORAGE_BUCKET=studybuddy-778f8.firebasestorage.app REACT_APP_FIREBASE_MESSAGING_SENDER_ID=733206808364 REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89 npm run build && cd .. && mkdir -p public && cp -r frontend/build/* public/",
     "render-build-simple": "./build-simple.sh",
-    "render-build-alt": "npm install --prefix frontend --production=false && npm install react-scripts@5.0.1 --prefix frontend --save-dev && cd frontend && REACT_APP_FIREBASE_API_KEY=AIzaSyAz4KaboNV1JnIfzTNmmXvfZuDEcziqWMo REACT_APP_FIREBASE_AUTH_DOMAIN=studybuddy-778f8.firebaseapp.com REACT_APP_FIREBASE_PROJECT_ID=studybuddy-778f8 REACT_APP_FIREBASE_STORAGE_BUCKET=studybuddy-778f8.firebasestorage.app REACT_APP_FIREBASE_MESSAGING_SENDER_ID=733206808364 REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89 npm run build && cd .. && mkdir -p public && cp -r frontend/build/* public/"
+    "render-build-alt": "npm install --prefix frontend --production=false && npm install react-scripts@5.0.1 --prefix frontend --save-dev && cd frontend && REACT_APP_FIREBASE_API_KEY=AIzaSyAz4KaboNV1JnIfzTNmmXvfZuDEcziqWMo REACT_APP_FIREBASE_AUTH_DOMAIN=studybuddy-778f8.firebaseapp.com REACT_APP_FIREBASE_PROJECT_ID=studybuddy-778f8 REACT_APP_FIREBASE_STORAGE_BUCKET=studybuddy-778f8.firebasestorage.app REACT_APP_FIREBASE_MESSAGING_SENDER_ID=733206808364 REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89 npm run build && cd .. && mkdir -p public && cp -r frontend/build/* public/",
+    "render-build-robust": "./build-robust.sh"
   },
   "keywords": [
     "ai",

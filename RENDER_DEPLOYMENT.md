@@ -38,9 +38,10 @@ Fill in these settings:
 
 **Build & Deploy Settings:**
 - **Build Command**: Try these options in order:
-  1. `npm run render-build-alt` (recommended - uses --prefix)
-  2. `npm run render-build-simple` (uses bash script)
-  3. `npm run render-build` (original npm script)
+  1. `npm run render-build-robust` (most reliable - creates files if missing)
+  2. `npm run render-build-alt` (uses --prefix)
+  3. `npm run render-build-simple` (uses bash script)
+  4. `npm run render-build` (original npm script)
 - **Start Command**: `npm start`
 - **Auto-Deploy**: ✅ Yes
 
