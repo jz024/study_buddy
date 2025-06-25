@@ -8,6 +8,8 @@ const TestChat = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+
   const sendMessage = async () => {
     if (!message.trim()) return;
 
@@ -16,7 +18,7 @@ const TestChat = () => {
 
     try {
       // This calls the backend API at port 5001
-      const result = await axios.post('http://localhost:5001/api/chat', {
+      const result = await axios.post(`${API_BASE_URL}/api/chat`, {
         message: message,
         subjectId: 'test-subject'
       });

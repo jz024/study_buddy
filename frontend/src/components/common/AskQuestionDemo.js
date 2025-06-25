@@ -15,6 +15,8 @@ import {
 import { Send, SmartToy } from '@mui/icons-material';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
+
 const AskQuestionDemo = () => {
   const theme = useTheme();
   const [question, setQuestion] = useState('');
@@ -34,10 +36,10 @@ const AskQuestionDemo = () => {
     setResponse('');
 
     try {
-      console.log('Sending request to:', 'http://localhost:5001/api/chat');
+      console.log('Sending request to:', `${API_BASE_URL}/api/chat`);
       console.log('Request data:', { message: question, subjectId: null });
       
-      const result = await axios.post('http://localhost:5001/api/chat', {
+      const result = await axios.post(`${API_BASE_URL}/api/chat`, {
         message: question.trim(),
         subjectId: null
       });
