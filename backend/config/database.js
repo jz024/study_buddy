@@ -8,9 +8,14 @@ const connectDB = async () => {
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    return conn;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
+    // Don't exit the process in serverless environments
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+      process.exit(1);
+    }
+    throw error;
   }
 };
 
