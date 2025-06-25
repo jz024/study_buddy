@@ -112,13 +112,32 @@ app.get('/api/test', (req, res) => {
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
   try {
-    // Serve static files from the public directory (created by build script)
-    app.use(express.static(path.join(__dirname, 'public')));
+    const publicPath = path.join(__dirname, 'public');
+    const indexPath = path.join(publicPath, 'index.html');
     
-    // Handle React routing, return all requests to React app
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    });
+    // Check if public directory and index.html exist
+    if (require('fs').existsSync(indexPath)) {
+      // Serve static files from the public directory (created by build script)
+      app.use(express.static(publicPath));
+      
+      // Handle React routing, return all requests to React app
+      app.get('*', (req, res) => {
+        res.sendFile(indexPath);
+      });
+    } else {
+      console.log('Frontend build not found, serving fallback');
+      app.get('*', (req, res) => {
+        res.json({ 
+          message: 'Frontend build not available',
+          status: 'Please ensure the frontend is built before deployment',
+          api: {
+            health: '/api/health',
+            test: '/api/test'
+          },
+          error: 'index.html not found in public directory'
+        });
+      });
+    }
   } catch (error) {
     console.log('Static files not available:', error.message);
     app.get('*', (req, res) => {

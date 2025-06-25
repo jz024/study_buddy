@@ -23,8 +23,20 @@ REACT_APP_FIREBASE_MESSAGING_SENDER_ID="733206808364" \
 REACT_APP_FIREBASE_APP_ID="1:733206808364:web:e325f8833192a502f9ce89" \
 npm run build
 
+# Go back to root directory
+cd ..
+
+# Create public directory if it doesn't exist
+echo "📁 Creating public directory..."
+mkdir -p public
+
 # Copy build to root directory for server to serve
 echo "📁 Copying build to root directory..."
-cp -r build ../public
+cp -r frontend/build/* public/
+
+# Verify the files were copied
+echo "✅ Verifying build files..."
+ls -la public/
+echo "✅ index.html exists: $(test -f public/index.html && echo 'YES' || echo 'NO')"
 
 echo "✅ Build completed successfully!" 

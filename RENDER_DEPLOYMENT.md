@@ -37,7 +37,7 @@ Fill in these settings:
 - **Branch**: `main`
 
 **Build & Deploy Settings:**
-- **Build Command**: `./build.sh`
+- **Build Command**: `npm run render-build` (recommended) OR `./build.sh`
 - **Start Command**: `npm start`
 - **Auto-Deploy**: ✅ Yes
 
@@ -70,6 +70,7 @@ REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89
 ### 3.1 Check Build Logs
 - Monitor the build process in Render dashboard
 - Look for any errors in the build logs
+- **Important**: Check if the build script is creating the `public` directory
 
 ### 3.2 Test Your App
 1. Visit your Render URL (e.g., `https://ai-study-buddy.onrender.com`)
@@ -94,19 +95,28 @@ REACT_APP_FIREBASE_APP_ID=1:733206808364:web:e325f8833192a502f9ce89
    - Ensure all dependencies are in package.json
    - Verify build script permissions
 
-2. **Firebase Errors**
+2. **"index.html not found" Error**
+   - This means the build script didn't create the public directory properly
+   - **Solution**: Use `npm run render-build` instead of `./build.sh`
+   - Check build logs to see if the copy command worked
+   - Verify the build script has proper permissions
+
+3. **Firebase Errors**
    - Check environment variables are set correctly
    - Verify Firebase project settings
    - Check browser console for specific errors
 
-3. **App Not Loading**
+4. **App Not Loading**
    - Check if the server is running
    - Verify PORT environment variable
    - Check Render service logs
 
 ### Debug Commands:
 ```bash
-# Check build script locally
+# Test the render-build script locally
+npm run render-build
+
+# Test the bash build script locally
 ./build.sh
 
 # Test server locally
@@ -115,6 +125,12 @@ NODE_ENV=production npm start
 # Check environment variables
 echo $REACT_APP_FIREBASE_API_KEY
 ```
+
+### If Build Script Fails:
+1. **Try the npm script instead**: Change build command to `npm run render-build`
+2. **Check file permissions**: Make sure build.sh is executable
+3. **Check build logs**: Look for specific error messages
+4. **Verify directory structure**: Ensure frontend/build exists after npm run build
 
 ## Advantages of Render over Vercel
 
