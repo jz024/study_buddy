@@ -11,25 +11,25 @@ const app = express();
 const PORT = parseInt(process.env.PORT) || 5001;
 
 // Disable MongoDB for now - will add later
-// let mongoose, connectDB, routes, errorHandler;
+let mongoose, connectDB, routes, errorHandler;
 
-// try {
-//   mongoose = require('mongoose');
-//   connectDB = require('./backend/config/database');
-//   routes = require('./backend/routes');
-//   errorHandler = require('./backend/middleware/errorHandler');
-// } catch (error) {
-//   console.log('Some modules not available:', error.message);
-// }
+try {
+  mongoose = require('mongoose');
+  connectDB = require('./backend/config/database');
+  routes = require('./backend/routes');
+  errorHandler = require('./backend/middleware/errorHandler');
+} catch (error) {
+  console.log('Some modules not available:', error.message);
+}
 
 // Connect to MongoDB only if available and in production
-// if (process.env.NODE_ENV === 'production' && connectDB && process.env.MONGODB_URI) {
-//   try {
-//     connectDB();
-//   } catch (error) {
-//     console.log('MongoDB connection failed:', error.message);
-//   }
-// }
+if (process.env.NODE_ENV === 'production' && connectDB && process.env.MONGODB_URI) {
+  try {
+    connectDB();
+  } catch (error) {
+    console.log('MongoDB connection failed:', error.message);
+  }
+}
 
 const allowedOrigins = [
   'https://study-buddy-c9d8.onrender.com',
@@ -39,16 +39,7 @@ const allowedOrigins = [
 
 // Security middleware
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'"],
-      connectSrc: ["'self'", "https://api.openai.com", ...allowedOrigins],
-    },
-  },
+  contentSecurityPolicy: false, // Temporarily disabled for Firebase
   crossOriginEmbedderPolicy: false
 }));
 
@@ -95,10 +86,10 @@ try {
   console.log('Uploads directory not available');
 }
 
-// API Routes (disabled for now)
-// if (routes) {
-//   app.use('/api', routes);
-// }
+// API Routes
+if (routes) {
+  app.use('/api', routes);
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -118,6 +109,70 @@ app.get('/api/test', (req, res) => {
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV || 'development',
     database: 'disabled'
+  });
+});
+
+// Simple chat endpoint (placeholder until full backend is enabled)
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message, subjectId } = req.body;
+    
+    if (!message || !message.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message is required'
+      });
+    }
+
+    // For now, return a simple response
+    // Later, this will integrate with OpenAI
+    const aiResponse = `I received your message: "${message}". This is a placeholder response. The full AI integration will be enabled soon!`;
+    
+    res.json({
+      success: true,
+      data: {
+        userMessage: message,
+        aiResponse: aiResponse,
+        timestamp: new Date().toISOString(),
+        subjectId: subjectId
+      }
+    });
+  } catch (error) {
+    console.error('Chat endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+// Simple auth endpoints (placeholder until full backend is enabled)
+app.post('/api/auth/signup', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Signup endpoint reached. Firebase handles authentication on the frontend.',
+    data: {
+      user: { id: 'placeholder-user-id' },
+      token: 'placeholder-token'
+    }
+  });
+});
+
+app.post('/api/auth/signin', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Signin endpoint reached. Firebase handles authentication on the frontend.',
+    data: {
+      user: { id: 'placeholder-user-id' },
+      token: 'placeholder-token'
+    }
+  });
+});
+
+app.post('/api/auth/signout', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Signout successful'
   });
 });
 
