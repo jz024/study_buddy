@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Paper, Alert } from '@mui/material';
 import axios from 'axios';
 
+const API_BASE_URL = ''; // Use relative URLs since proxy is configured
+
 const TestChat = () => {
   const [message, setMessage] = useState('');
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 
   const sendMessage = async () => {
     if (!message.trim()) return;

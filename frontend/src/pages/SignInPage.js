@@ -11,17 +11,21 @@ import {
   IconButton,
   InputAdornment,
   Divider,
-  useTheme
+  useTheme,
+  alpha
 } from '@mui/material';
 import {
   Visibility,
   VisibilityOff,
   School,
   Google,
-  Facebook
+  Facebook,
+  Email,
+  Lock
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 const SignInPage = () => {
   const theme = useTheme();
@@ -88,6 +92,37 @@ const SignInPage = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 }
+    }
+  };
+
+  const buttonVariants = {
+    hover: {
+      scale: 1.02,
+      transition: { duration: 0.2 }
+    },
+    tap: {
+      scale: 0.98
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -95,161 +130,292 @@ const SignInPage = () => {
         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
         display: 'flex',
         alignItems: 'center',
-        py: 4
+        py: 4,
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
-      <Container maxWidth="sm">
-        <Paper
-          elevation={24}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(10px)'
-          }}
+      {/* Animated background elements */}
+      <motion.div
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, 5, 0]
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        style={{
+          position: 'absolute',
+          top: '10%',
+          left: '5%',
+          width: '200px',
+          height: '200px',
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.1)',
+          zIndex: 0
+        }}
+      />
+      <motion.div
+        animate={{
+          y: [0, 20, 0],
+          rotate: [0, -5, 0]
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2
+        }}
+        style={{
+          position: 'absolute',
+          bottom: '10%',
+          right: '5%',
+          width: '150px',
+          height: '150px',
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.05)',
+          zIndex: 0
+        }}
+      />
+
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
         >
-          {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <School sx={{ fontSize: 40, color: theme.palette.primary.main, mr: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
-                AI Study Buddy
-              </Typography>
-            </Box>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-              Welcome Back
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Sign in to continue your learning journey
-            </Typography>
-          </Box>
+          <Paper
+            elevation={24}
+            sx={{
+              p: { xs: 3, md: 4 },
+              borderRadius: 4,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            {/* Header */}
+            <motion.div variants={itemVariants}>
+              <Box sx={{ textAlign: 'center', mb: 4 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                    <School sx={{ fontSize: 48, color: theme.palette.primary.main, mr: 1 }} />
+                    <Typography variant="h3" sx={{ fontWeight: 800, color: theme.palette.primary.main }}>
+                      AI Study Buddy
+                    </Typography>
+                  </Box>
+                </motion.div>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+                  Welcome Back
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
+                  Sign in to continue your learning journey
+                </Typography>
+              </Box>
+            </motion.div>
 
-          {/* Error Alert */}
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
-
-          {/* Sign In Form */}
-          <Box component="form" onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Email Address"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-              sx={{ mb: 2 }}
-              variant="outlined"
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
-              sx={{ mb: 2 }}
-              variant="outlined"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
-
-            {/* Forgot Password Link */}
-            <Box sx={{ textAlign: 'right', mb: 3 }}>
-              <Link
-                component={RouterLink}
-                to="/forgot-password"
-                variant="body2"
-                sx={{
-                  textDecoration: 'none',
-                  '&:hover': { textDecoration: 'underline' }
-                }}
+            {/* Error Alert */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
               >
-                Forgot Password?
-              </Link>
+                <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                  {error}
+                </Alert>
+              </motion.div>
+            )}
+
+            {/* Sign In Form */}
+            <Box component="form" onSubmit={handleSubmit}>
+              <motion.div variants={itemVariants}>
+                <TextField
+                  fullWidth
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={!!formErrors.email}
+                  helperText={formErrors.email}
+                  sx={{ mb: 3 }}
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email sx={{ color: theme.palette.primary.main }} />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <TextField
+                  fullWidth
+                  label="Password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={!!formErrors.password}
+                  helperText={formErrors.password}
+                  sx={{ mb: 2 }}
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock sx={{ color: theme.palette.primary.main }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </motion.div>
+
+              {/* Forgot Password Link */}
+              <motion.div variants={itemVariants}>
+                <Box sx={{ textAlign: 'right', mb: 3 }}>
+                  <Link
+                    component={RouterLink}
+                    to="/forgot-password"
+                    variant="body2"
+                    sx={{
+                      textDecoration: 'none',
+                      color: theme.palette.primary.main,
+                      fontWeight: 500,
+                      '&:hover': { 
+                        textDecoration: 'underline',
+                        color: theme.palette.primary.dark
+                      }
+                    }}
+                  >
+                    Forgot Password?
+                  </Link>
+                </Box>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <motion.div
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    disabled={loading}
+                    sx={{
+                      py: 2,
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      mb: 3,
+                      borderRadius: 3,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                      boxShadow: '0 8px 25px rgba(99, 102, 241, 0.3)',
+                      '&:hover': {
+                        background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                        boxShadow: '0 12px 35px rgba(99, 102, 241, 0.4)',
+                      }
+                    }}
+                  >
+                    {loading ? 'Signing In...' : 'Sign In'}
+                  </Button>
+                </motion.div>
+              </motion.div>
             </Box>
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={loading}
-              sx={{
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                mb: 3
-              }}
-            >
-              {loading ? 'Signing In...' : 'Sign In'}
-            </Button>
-          </Box>
+            {/* Divider */}
+            <motion.div variants={itemVariants}>
+              <Divider sx={{ my: 3 }}>
+                <Typography variant="body2" color="text.secondary">
+                  or continue with
+                </Typography>
+              </Divider>
+            </motion.div>
 
-          {/* Divider */}
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              or continue with
-            </Typography>
-          </Divider>
+            {/* Social Sign In Buttons */}
+            <motion.div variants={itemVariants}>
+              <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Google />}
+                  sx={{ 
+                    py: 1.5,
+                    borderRadius: 3,
+                    borderColor: alpha(theme.palette.grey[400], 0.5),
+                    '&:hover': {
+                      borderColor: theme.palette.grey[400],
+                      backgroundColor: alpha(theme.palette.grey[100], 0.5)
+                    }
+                  }}
+                  disabled // We'll implement these later
+                >
+                  Google
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Facebook />}
+                  sx={{ 
+                    py: 1.5,
+                    borderRadius: 3,
+                    borderColor: alpha(theme.palette.grey[400], 0.5),
+                    '&:hover': {
+                      borderColor: theme.palette.grey[400],
+                      backgroundColor: alpha(theme.palette.grey[100], 0.5)
+                    }
+                  }}
+                  disabled // We'll implement these later
+                >
+                  Facebook
+                </Button>
+              </Box>
+            </motion.div>
 
-          {/* Social Sign In Buttons */}
-          <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Google />}
-              sx={{ py: 1.5 }}
-              disabled // We'll implement these later
-            >
-              Google
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Facebook />}
-              sx={{ py: 1.5 }}
-              disabled // We'll implement these later
-            >
-              Facebook
-            </Button>
-          </Box>
-
-          {/* Sign Up Link */}
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Don't have an account?{' '}
-              <Link
-                component={RouterLink}
-                to="/register"
-                sx={{
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  '&:hover': { textDecoration: 'underline' }
-                }}
-              >
-                Sign Up
-              </Link>
-            </Typography>
-          </Box>
-        </Paper>
+            {/* Sign Up Link */}
+            <motion.div variants={itemVariants}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary">
+                  Don't have an account?{' '}
+                  <Link
+                    component={RouterLink}
+                    to="/register"
+                    sx={{
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      color: theme.palette.primary.main,
+                      '&:hover': { 
+                        textDecoration: 'underline',
+                        color: theme.palette.primary.dark
+                      }
+                    }}
+                  >
+                    Sign Up
+                  </Link>
+                </Typography>
+              </Box>
+            </motion.div>
+          </Paper>
+        </motion.div>
       </Container>
     </Box>
   );

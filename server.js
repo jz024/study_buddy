@@ -34,7 +34,9 @@ if (process.env.NODE_ENV === 'production' && connectDB && process.env.MONGODB_UR
 const allowedOrigins = [
   'https://study-buddy-c9d8.onrender.com',
   'http://localhost:3000',
-  'http://127.0.0.1:3000'
+  'http://127.0.0.1:3000',
+  'http://localhost:5001',
+  'http://127.0.0.1:5001'
 ];
 
 // Security middleware
@@ -62,11 +64,17 @@ app.use('/api', limiter);
 // CORS - allow only allowedOrigins
 const corsOptions = {
   origin: function(origin, callback) {
+    console.log('CORS origin check:', origin);
     // Allow requests with no origin (like mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('No origin - allowing request');
+      return callback(null, true);
+    }
     if (allowedOrigins.includes(origin)) {
+      console.log('Origin allowed:', origin);
       return callback(null, true);
     } else {
+      console.log('Origin not allowed:', origin);
       return callback(new Error('Not allowed by CORS'));
     }
   },
@@ -84,6 +92,14 @@ try {
   app.use('/uploads', express.static(path.join(__dirname, 'backend/uploads')));
 } catch (error) {
   console.log('Uploads directory not available');
+}
+
+// Speech-to-Text routes
+try {
+  const speechRoutes = require('./backend/routes/speech');
+  app.use('/api/speech', speechRoutes);
+} catch (error) {
+  console.log('Speech routes not available:', error.message);
 }
 
 // API Routes
@@ -110,40 +126,6 @@ app.get('/api/test', (req, res) => {
     env: process.env.NODE_ENV || 'development',
     database: 'disabled'
   });
-});
-
-// Simple chat endpoint (placeholder until full backend is enabled)
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message, subjectId } = req.body;
-    
-    if (!message || !message.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Message is required'
-      });
-    }
-
-    // For now, return a simple response
-    // Later, this will integrate with OpenAI
-    const aiResponse = `I received your message: "${message}". This is a placeholder response. The full AI integration will be enabled soon!`;
-    
-    res.json({
-      success: true,
-      data: {
-        userMessage: message,
-        aiResponse: aiResponse,
-        timestamp: new Date().toISOString(),
-        subjectId: subjectId
-      }
-    });
-  } catch (error) {
-    console.error('Chat endpoint error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
 });
 
 // Simple auth endpoints (placeholder until full backend is enabled)

@@ -3,6 +3,15 @@ const openai = require('../config/openai');
 class OpenAIService {
   async generateChatResponse(messages, context = '') {
     try {
+      // Check if OpenAI client is initialized
+      if (!openai) {
+        console.log('OpenAI client not initialized - returning placeholder response');
+        return {
+          content: "I'm sorry, but I'm currently in demo mode. The OpenAI API key is not configured. Please set up your OpenAI API key to enable full AI functionality.",
+          tokensUsed: 0
+        };
+      }
+
       const systemMessage = {
         role: 'system',
         content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses.`
@@ -27,6 +36,16 @@ class OpenAIService {
 
   async generateFlashcards(content, count = 5) {
     try {
+      // Check if OpenAI client is initialized
+      if (!openai) {
+        console.log('OpenAI client not initialized - returning placeholder flashcards');
+        return [
+          { question: "Sample Question 1", answer: "Sample Answer 1" },
+          { question: "Sample Question 2", answer: "Sample Answer 2" },
+          { question: "Sample Question 3", answer: "Sample Answer 3" }
+        ];
+      }
+
       const prompt = `Based on the following content, generate ${count} flashcard questions and answers. Return them in JSON format as an array of objects with 'question' and 'answer' properties.
 
 Content: ${content}
@@ -54,6 +73,23 @@ Format:
 
   async generateQuiz(content, questionCount = 5, difficulty = 'medium') {
     try {
+      // Check if OpenAI client is initialized
+      if (!openai) {
+        console.log('OpenAI client not initialized - returning placeholder quiz');
+        return {
+          title: "Sample Quiz",
+          questions: [
+            {
+              question: "This is a sample question?",
+              type: "multiple-choice",
+              options: ["A", "B", "C", "D"],
+              correctAnswer: "A",
+              explanation: "This is a sample explanation"
+            }
+          ]
+        };
+      }
+
       const prompt = `Based on the following content, generate a ${difficulty} difficulty quiz with ${questionCount} questions. Include multiple choice, true/false, and short answer questions. Return in JSON format.
 
 Content: ${content}
@@ -89,6 +125,12 @@ Format:
 
   async generateEmbedding(text) {
     try {
+      // Check if OpenAI client is initialized
+      if (!openai) {
+        console.log('OpenAI client not initialized - returning placeholder embedding');
+        return new Array(1536).fill(0); // Return zero vector
+      }
+
       const response = await openai.embeddings.create({
         model: 'text-embedding-ada-002',
         input: text
@@ -103,6 +145,12 @@ Format:
 
   async summarizeText(text, maxLength = 200) {
     try {
+      // Check if OpenAI client is initialized
+      if (!openai) {
+        console.log('OpenAI client not initialized - returning placeholder summary');
+        return `This is a placeholder summary of the text. Please set up your OpenAI API key to enable full AI functionality.`;
+      }
+
       const prompt = `Summarize the following text in ${maxLength} words or less:\n\n${text}`;
 
       const response = await openai.chat.completions.create({

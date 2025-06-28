@@ -6,6 +6,8 @@ import LandingPage from './pages/LandingPage';
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
 import DashboardPage from './pages/DashboardPage';
+import UserProfilePage from './pages/UserProfilePage';
+import SubjectWorkspacePage from './pages/SubjectWorkspacePage';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
       
       {/* Protected Routes */}
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/profile" element={<UserProfilePage />} />
+      <Route path="/subject/:subjectId" element={<SubjectWorkspacePage />} />
       
       {/* Catch all route - redirect to home */}
       <Route path="*" element={<LandingPage />} />
