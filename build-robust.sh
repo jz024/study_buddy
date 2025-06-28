@@ -4,9 +4,18 @@ set -e  # Exit on any error
 
 echo "🚀 Building AI Study Buddy for Render (Robust Version)..."
 
-# Install backend dependencies first
+# Install backend dependencies first (this should happen automatically, but let's be explicit)
 echo "📦 Installing backend dependencies..."
 npm install --production=false
+
+# Verify critical packages are installed
+echo "🔍 Verifying critical packages..."
+if [ -d "node_modules/@google-cloud/speech" ]; then
+    echo "✅ @google-cloud/speech package found"
+else
+    echo "❌ @google-cloud/speech package NOT found - installing..."
+    npm install @google-cloud/speech --save
+fi
 
 # Navigate to frontend directory
 cd frontend
