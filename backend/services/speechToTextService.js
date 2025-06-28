@@ -1,5 +1,14 @@
 const speech = require('@google-cloud/speech');
-const audioConversionService = require('./audioConversionService');
+
+// Try to load audio conversion service, but don't fail if it's not available
+let audioConversionService;
+try {
+  audioConversionService = require('./audioConversionService');
+  console.log('✅ Audio conversion service loaded successfully');
+} catch (error) {
+  console.log('⚠️ Audio conversion service not available:', error.message);
+  audioConversionService = null;
+}
 
 class SpeechToTextService {
   constructor() {
@@ -45,8 +54,19 @@ class SpeechToTextService {
       const originalFormat = encoding || 'audio/webm;codecs=opus';
       console.log('Processing audio:', { length: audioBuffer.length, format: originalFormat });
       
-      const convertedAudio = await audioConversionService.convertToGoogleSpeechFormat(audioBuffer, originalFormat);
-      console.log('Audio converted:', { encoding: convertedAudio.encoding, sampleRate: convertedAudio.sampleRateHertz });
+      let convertedAudio;
+      if (audioConversionService) {
+        convertedAudio = await audioConversionService.convertToGoogleSpeechFormat(audioBuffer, originalFormat);
+        console.log('Audio converted:', { encoding: convertedAudio.encoding, sampleRate: convertedAudio.sampleRateHertz });
+      } else {
+        // Fallback when audio conversion service is not available
+        console.log('Audio conversion service not available, using original format');
+        convertedAudio = {
+          buffer: audioBuffer,
+          encoding: 'OGG_OPUS',
+          sampleRateHertz: 48000
+        };
+      }
 
       const audio = {
         content: convertedAudio.buffer.toString('base64')

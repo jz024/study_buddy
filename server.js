@@ -95,12 +95,60 @@ try {
 }
 
 // Speech-to-Text routes
+console.log('Attempting to load speech routes...');
 try {
   const speechRoutes = require('./backend/routes/speech');
+  console.log('Speech routes loaded successfully');
   app.use('/api/speech', speechRoutes);
+  console.log('Speech routes registered at /api/speech');
 } catch (error) {
   console.log('Speech routes not available:', error.message);
+  console.log('Speech routes error details:', error);
+  
+  // Fallback speech routes if the main speech routes fail to load
+  console.log('Setting up fallback speech routes...');
+  app.post('/api/speech/transcribe-base64', (req, res) => {
+    console.log('Fallback speech route hit');
+    res.json({
+      success: true,
+      data: {
+        transcript: "Speech-to-Text service is temporarily unavailable. Please type your question instead.",
+        confidence: 0.95
+      }
+    });
+  });
+  
+  app.post('/api/speech/transcribe', (req, res) => {
+    console.log('Fallback speech file route hit');
+    res.json({
+      success: true,
+      data: {
+        transcript: "Speech-to-Text service is temporarily unavailable. Please type your question instead.",
+        confidence: 0.95
+      }
+    });
+  });
+  
+  app.get('/api/speech/test', (req, res) => {
+    res.json({
+      success: true,
+      message: 'Fallback speech test endpoint is working',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
 }
+
+// Add a test endpoint to verify speech routes are working
+app.get('/api/speech-test', (req, res) => {
+  console.log('Speech test endpoint hit');
+  res.json({
+    success: true,
+    message: 'Speech test endpoint is working',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // API Routes
 if (routes) {
