@@ -20,7 +20,10 @@ import {
   Chat,
   TrendingUp,
   ArrowDownward,
-  PlayArrow
+  PlayArrow,
+  AutoAwesome,
+  Lightbulb,
+  RocketLaunch
 } from '@mui/icons-material';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import AskQuestionDemo from '../components/common/AskQuestionDemo';
@@ -45,39 +48,45 @@ const LandingPage = () => {
   const features = [
     {
       icon: <Upload />,
-      title: 'Document Upload',
-      description: 'Upload PDF and DOCX files to create comprehensive study materials automatically.',
-      color: '#FF6B6B'
+      title: 'Smart Document Processing',
+      description: 'Upload any study material and watch AI transform it into comprehensive learning resources.',
+      color: '#667eea',
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     },
     {
       icon: <Chat />,
-      title: 'AI Study Assistant',
-      description: 'Get instant answers and explanations on any topic with our intelligent chat system.',
-      color: '#4ECDC4'
+      title: 'Intelligent Study Assistant',
+      description: 'Get instant, contextual answers and explanations with our advanced AI conversation system.',
+      color: '#f093fb',
+      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
     {
       icon: <Psychology />,
-      title: 'Smart Flashcards',
-      description: 'AI-generated flashcards with spaced repetition to optimize your learning retention.',
-      color: '#45B7D1'
+      title: 'Adaptive Learning Engine',
+      description: 'AI-generated flashcards with intelligent spacing that adapts to your learning patterns.',
+      color: '#4facfe',
+      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
     },
     {
       icon: <Quiz />,
-      title: 'Adaptive Quizzes',
-      description: 'Personalized quizzes that adapt to your learning progress and identify weak areas.',
-      color: '#96CEB4'
+      title: 'Personalized Assessment',
+      description: 'Dynamic quizzes that evolve based on your performance and learning objectives.',
+      color: '#43e97b',
+      gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
     },
     {
       icon: <School />,
-      title: 'Subject Organization',
-      description: 'Organize your studies by subjects with color-coded categories and progress tracking.',
-      color: '#FFEAA7'
+      title: 'Organized Knowledge Hub',
+      description: 'Beautifully organized study spaces with intelligent categorization and progress tracking.',
+      color: '#fa709a',
+      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
     },
     {
       icon: <TrendingUp />,
-      title: 'Progress Analytics',
-      description: 'Track your learning progress with detailed analytics and performance insights.',
-      color: '#DDA0DD'
+      title: 'Advanced Analytics',
+      description: 'Deep insights into your learning journey with predictive analytics and performance trends.',
+      color: '#a8edea',
+      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
     }
   ];
 
@@ -86,19 +95,19 @@ const LandingPage = () => {
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.6,
-        staggerChildren: 0.2
+        duration: 0.8,
+        staggerChildren: 0.3
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 50, opacity: 0 },
+    hidden: { y: 60, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.6,
+        duration: 0.8,
         ease: "easeOut"
       }
     }
@@ -107,38 +116,16 @@ const LandingPage = () => {
   const buttonVariants = {
     hover: {
       scale: 1.05,
-      transition: { duration: 0.2 }
+      transition: { duration: 0.3 }
     },
     tap: {
       scale: 0.95
     }
   };
 
+  // Enhanced floating animations
   const floatingAnimation = {
-    y: [0, -10, 0],
-    transition: {
-      duration: 3,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  };
-
-  // More dynamic background animations
-  const dynamicFloatingAnimation = {
-    y: [0, -30, 0],
-    x: [0, 20, 0],
-    rotate: [0, 180, 360],
-    scale: [1, 1.2, 1],
-    transition: {
-      duration: 8,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  };
-
-  const pulseAnimation = {
-    scale: [1, 1.3, 1],
-    opacity: [0.3, 0.7, 0.3],
+    y: [0, -20, 0],
     transition: {
       duration: 4,
       repeat: Infinity,
@@ -146,9 +133,21 @@ const LandingPage = () => {
     }
   };
 
-  const waveAnimation = {
-    y: [0, -15, 0],
-    rotate: [0, 5, -5, 0],
+  const dynamicFloatingAnimation = {
+    y: [0, -40, 0],
+    x: [0, 30, 0],
+    rotate: [0, 180, 360],
+    scale: [1, 1.3, 1],
+    transition: {
+      duration: 12,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  };
+
+  const pulseAnimation = {
+    scale: [1, 1.4, 1],
+    opacity: [0.2, 0.6, 0.2],
     transition: {
       duration: 6,
       repeat: Infinity,
@@ -156,50 +155,38 @@ const LandingPage = () => {
     }
   };
 
-  // Even more dynamic animations
-  const spiralAnimation = {
-    y: [0, -40, 0],
-    x: [0, 30, -30, 0],
-    rotate: [0, 90, 180, 270, 360],
-    scale: [1, 1.4, 0.8, 1.2, 1],
-    transition: {
-      duration: 15,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  };
-
-  const bounceAnimation = {
+  const waveAnimation = {
     y: [0, -25, 0],
-    scale: [1, 1.1, 1],
+    rotate: [0, 10, -10, 0],
     transition: {
-      duration: 2,
+      duration: 8,
       repeat: Infinity,
       ease: "easeInOut"
     }
   };
 
-  const zigzagAnimation = {
-    y: [0, -20, 0, -10, 0],
-    x: [0, 15, 0, -15, 0],
-    rotate: [0, 15, 0, -15, 0],
+  const spiralAnimation = {
+    y: [0, -50, 0],
+    x: [0, 40, -40, 0],
+    rotate: [0, 90, 180, 270, 360],
+    scale: [1, 1.5, 0.8, 1.3, 1],
     transition: {
-      duration: 7,
+      duration: 20,
       repeat: Infinity,
       ease: "easeInOut"
     }
   };
 
   const glowAnimation = {
-    scale: [1, 1.5, 1],
-    opacity: [0.2, 0.8, 0.2],
+    scale: [1, 1.6, 1],
+    opacity: [0.1, 0.8, 0.1],
     boxShadow: [
-      '0 0 20px rgba(255, 255, 255, 0.3)',
-      '0 0 40px rgba(255, 255, 255, 0.6)',
-      '0 0 20px rgba(255, 255, 255, 0.3)'
+      '0 0 30px rgba(255, 255, 255, 0.2)',
+      '0 0 60px rgba(255, 255, 255, 0.8)',
+      '0 0 30px rgba(255, 255, 255, 0.2)'
     ],
     transition: {
-      duration: 3,
+      duration: 4,
       repeat: Infinity,
       ease: "easeInOut"
     }
@@ -217,12 +204,19 @@ const LandingPage = () => {
         <Box
           sx={{
             minHeight: '100vh',
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 25%, rgba(240, 147, 251, 0.8) 50%, rgba(245, 87, 108, 0.8) 75%, rgba(79, 172, 254, 0.8) 100%)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 15s ease infinite',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             position: 'relative',
             overflow: 'hidden',
+            '@keyframes gradientShift': {
+              '0%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+              '100%': { backgroundPosition: '0% 50%' }
+            },
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -230,7 +224,7 @@ const LandingPage = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M40 40v-8h-4v8h-8v4h8v8h4v-8h8v-4h-8zm0-40V0h-4v8h-8v4h8v8h4V12h8V8h-8zM8 40v-8H0v8H0v4h8v8h4v-8h8v-4H8zM8 8V0H0v8H0v4h8v8h4V12h8V8H8z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }
           }}
         >
@@ -239,28 +233,30 @@ const LandingPage = () => {
             animate={dynamicFloatingAnimation}
             style={{
               position: 'absolute',
-              top: '15%',
-              left: '8%',
-              width: '120px',
-              height: '120px',
+              top: '10%',
+              left: '5%',
+              width: '150px',
+              height: '150px',
               borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05))',
+              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03))',
+              backdropFilter: 'blur(10px)',
               zIndex: 0
             }}
           />
           <motion.div
             animate={{
               ...pulseAnimation,
-              transition: { ...pulseAnimation.transition, delay: 1 }
+              transition: { ...pulseAnimation.transition, delay: 2 }
             }}
             style={{
               position: 'absolute',
-              top: '25%',
-              right: '12%',
-              width: '180px',
-              height: '180px',
+              top: '20%',
+              right: '8%',
+              width: '200px',
+              height: '200px',
               borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03))',
+              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02))',
+              backdropFilter: 'blur(15px)',
               zIndex: 0
             }}
           />
@@ -268,105 +264,27 @@ const LandingPage = () => {
             animate={waveAnimation}
             style={{
               position: 'absolute',
-              bottom: '25%',
-              left: '15%',
-              width: '100px',
-              height: '100px',
+              bottom: '20%',
+              left: '10%',
+              width: '120px',
+              height: '120px',
               borderRadius: '50%',
               background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02))',
+              backdropFilter: 'blur(8px)',
               zIndex: 0
             }}
           />
-          <motion.div
-            animate={{
-              ...dynamicFloatingAnimation,
-              transition: { ...dynamicFloatingAnimation.transition, delay: 2, duration: 10 }
-            }}
-            style={{
-              position: 'absolute',
-              bottom: '15%',
-              right: '8%',
-              width: '140px',
-              height: '140px',
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04))',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={{
-              y: [0, -20, 0],
-              rotate: [0, 90, 180, 270, 360],
-              transition: { duration: 12, repeat: Infinity, ease: "linear" }
-            }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '300px',
-              height: '300px',
-              borderRadius: '50%',
-              border: '2px solid rgba(255, 255, 255, 0.1)',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.1, 0.3, 0.1],
-              transition: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }
-            }}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '200px',
-              height: '200px',
-              borderRadius: '50%',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              zIndex: 0
-            }}
-          />
-
-          {/* Additional dynamic elements */}
           <motion.div
             animate={spiralAnimation}
             style={{
               position: 'absolute',
-              top: '10%',
-              right: '20%',
-              width: '80px',
-              height: '80px',
+              bottom: '15%',
+              right: '5%',
+              width: '180px',
+              height: '180px',
               borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.08))',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={bounceAnimation}
-            style={{
-              position: 'absolute',
-              top: '35%',
-              left: '5%',
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.06))',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={zigzagAnimation}
-            style={{
-              position: 'absolute',
-              bottom: '35%',
-              right: '25%',
-              width: '90px',
-              height: '90px',
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.07))',
+              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01))',
+              backdropFilter: 'blur(12px)',
               zIndex: 0
             }}
           />
@@ -374,121 +292,85 @@ const LandingPage = () => {
             animate={glowAnimation}
             style={{
               position: 'absolute',
-              top: '20%',
+              top: '50%',
               left: '50%',
-              transform: 'translateX(-50%)',
-              width: '150px',
-              height: '150px',
+              transform: 'translate(-50%, -50%)',
+              width: '400px',
+              height: '400px',
               borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1))',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={{
-              ...spiralAnimation,
-              transition: { ...spiralAnimation.transition, delay: 3, duration: 18 }
-            }}
-            style={{
-              position: 'absolute',
-              bottom: '10%',
-              left: '25%',
-              width: '70px',
-              height: '70px',
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05))',
-              zIndex: 0
-            }}
-          />
-          <motion.div
-            animate={{
-              y: [0, -30, 0],
-              x: [0, -25, 0],
-              rotate: [0, -180, -360],
-              scale: [1, 1.3, 1],
-              transition: { duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2.5 }
-            }}
-            style={{
-              position: 'absolute',
-              top: '45%',
-              right: '5%',
-              width: '110px',
-              height: '110px',
-              borderRadius: '50%',
-              background: 'linear-gradient(45deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04))',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
               zIndex: 0
             }}
           />
 
           <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 80 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 1, delay: 0.3 }}
             >
               <Box sx={{ textAlign: 'center' }}>
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
+                  transition={{ duration: 1, delay: 0.5 }}
                 >
-                  <Typography 
-                    variant="h1" 
-                    sx={{ 
-                      fontSize: { xs: '3rem', sm: '4rem', md: '5rem', lg: '6rem' },
-                      fontWeight: 800,
-                      mb: 3,
-                      textShadow: '0 4px 8px rgba(0,0,0,0.3)',
-                      background: 'linear-gradient(45deg, #1E40AF 0%, #3B82F6 20%, #60A5FA 40%, #93C5FD 60%, #BFDBFE 80%, #DBEAFE 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      animation: 'gradientShift 2s ease-in-out infinite',
-                      filter: 'brightness(1.4) contrast(1.2)',
-                      '@keyframes gradientShift': {
-                        '0%': {
-                          backgroundPosition: '0% 50%'
-                        },
-                        '50%': {
-                          backgroundPosition: '100% 50%'
-                        },
-                        '100%': {
-                          backgroundPosition: '0% 50%'
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                    <AutoAwesome sx={{ fontSize: 60, color: '#FFD700', mr: 2 }} />
+                    <Typography 
+                      variant="h1" 
+                      sx={{ 
+                        fontSize: { xs: '3.5rem', sm: '4.5rem', md: '5.5rem', lg: '6.5rem' },
+                        fontWeight: 900,
+                        background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 25%, #FF6347 50%, #FF1493 75%, #9370DB 100%)',
+                        backgroundSize: '300% 300%',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        animation: 'gradientShift 3s ease-in-out infinite',
+                        textShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                        filter: 'brightness(1.2) contrast(1.1)',
+                        '@keyframes gradientShift': {
+                          '0%': { backgroundPosition: '0% 50%' },
+                          '50%': { backgroundPosition: '100% 50%' },
+                          '100%': { backgroundPosition: '0% 50%' }
                         }
-                      }
-                    }}
-                  >
-                    AI Study Buddy
-                  </Typography>
+                      }}
+                    >
+                      AI Study Buddy
+                    </Typography>
+                    <AutoAwesome sx={{ fontSize: 60, color: '#FFD700', ml: 2 }} />
+                  </Box>
                 </motion.div>
                 
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
+                  transition={{ duration: 1, delay: 0.7 }}
                 >
                   <Typography 
-                    variant="h4" 
+                    variant="h3" 
                     sx={{ 
-                      mb: 6, 
-                      opacity: 0.9,
-                      maxWidth: '700px',
+                      mb: 4, 
+                      opacity: 0.95,
+                      maxWidth: '800px',
                       mx: 'auto',
-                      fontSize: { xs: '1.2rem', md: '1.5rem' },
+                      fontSize: { xs: '1.4rem', md: '1.8rem' },
                       fontWeight: 300,
-                      lineHeight: 1.4
+                      lineHeight: 1.5,
+                      textShadow: '0 2px 8px rgba(0,0,0,0.2)'
                     }}
                   >
-                    Your personal AI-powered learning companion that transforms how you study
+                    Revolutionize your learning with AI-powered intelligence that adapts to your unique study style
                   </Typography>
                 </motion.div>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
+                  transition={{ duration: 1, delay: 0.9 }}
                 >
-                  <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center', flexWrap: 'wrap', mb: 4 }}>
+                  <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center', flexWrap: 'wrap', mb: 6 }}>
                     <motion.div
                       variants={buttonVariants}
                       whileHover="hover"
@@ -498,23 +380,25 @@ const LandingPage = () => {
                         variant="contained" 
                         size="large"
                         onClick={() => navigate('/register')}
-                        startIcon={<PlayArrow />}
+                        startIcon={<RocketLaunch />}
                         sx={{ 
-                          bgcolor: '#ffffff',
-                          color: theme.palette.primary.main,
-                          px: 5,
-                          py: 2,
-                          fontSize: '1.1rem',
-                          fontWeight: 600,
+                          background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 100%)',
+                          color: '#1a1a1a',
+                          px: 6,
+                          py: 2.5,
+                          fontSize: '1.2rem',
+                          fontWeight: 700,
                           borderRadius: '50px',
-                          boxShadow: '0 8px 25px rgba(0,0,0,0.2)',
+                          boxShadow: '0 12px 40px rgba(255, 215, 0, 0.4)',
+                          textTransform: 'none',
                           '&:hover': {
-                            bgcolor: alpha('#ffffff', 0.9),
-                            boxShadow: '0 12px 35px rgba(0,0,0,0.3)'
+                            background: 'linear-gradient(45deg, #FFA500 0%, #FFD700 100%)',
+                            boxShadow: '0 16px 50px rgba(255, 215, 0, 0.6)',
+                            transform: 'translateY(-2px)'
                           }
                         }}
                       >
-                        Get Started Free
+                        Get Started
                       </Button>
                     </motion.div>
                     
@@ -527,19 +411,23 @@ const LandingPage = () => {
                         variant="outlined" 
                         size="large"
                         onClick={() => navigate('/login')}
+                        startIcon={<Lightbulb />}
                         sx={{ 
                           borderColor: '#ffffff',
-                          borderWidth: 2,
+                          borderWidth: 3,
                           color: '#ffffff',
-                          px: 5,
-                          py: 2,
-                          fontSize: '1.1rem',
+                          px: 6,
+                          py: 2.5,
+                          fontSize: '1.2rem',
                           fontWeight: 600,
                           borderRadius: '50px',
+                          textTransform: 'none',
+                          backdropFilter: 'blur(10px)',
                           '&:hover': {
-                            borderColor: '#ffffff',
-                            bgcolor: alpha('#ffffff', 0.1),
-                            borderWidth: 2
+                            borderColor: '#FFD700',
+                            bgcolor: 'rgba(255, 215, 0, 0.1)',
+                            borderWidth: 3,
+                            transform: 'translateY(-2px)'
                           }
                         }}
                       >
@@ -549,13 +437,18 @@ const LandingPage = () => {
                   </Box>
                 </motion.div>
 
-                {/* Scroll indicator */}
+                {/* Enhanced scroll indicator */}
                 <motion.div
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  animate={{ y: [0, 15, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
                   style={{ marginTop: '4rem' }}
                 >
-                  <ArrowDownward sx={{ fontSize: 40, opacity: 0.7 }} />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" sx={{ opacity: 0.8, fontWeight: 500 }}>
+                      Discover More
+                    </Typography>
+                    <ArrowDownward sx={{ fontSize: 40, opacity: 0.7 }} />
+                  </Box>
                 </motion.div>
               </Box>
             </motion.div>
@@ -564,8 +457,25 @@ const LandingPage = () => {
       </motion.div>
 
       {/* Features Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'grey.50' }}>
-        <Container maxWidth="lg">
+      <Box sx={{ 
+        py: { xs: 10, md: 16 }, 
+        background: 'linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(245, 87, 108, 0.1) 20%, rgba(240, 147, 251, 0.1) 40%, rgba(102, 126, 234, 0.1) 60%, rgba(118, 75, 162, 0.1) 80%, #f5f7fa 100%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background pattern */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23667eea' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
+        
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -573,24 +483,33 @@ const LandingPage = () => {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
-              <Box sx={{ textAlign: 'center', mb: 8 }}>
+              <Box sx={{ textAlign: 'center', mb: 12 }}>
                 <Typography 
                   variant="h2" 
                   sx={{ 
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                    fontWeight: 700,
-                    mb: 3,
-                    color: theme.palette.primary.main
+                    fontSize: { xs: '3rem', md: '4rem' },
+                    fontWeight: 800,
+                    mb: 4,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
                   }}
                 >
-                  Powerful Features for Smart Learning
+                  Powerful Features for Modern Learning
                 </Typography>
                 <Typography 
-                  variant="h6" 
+                  variant="h5" 
                   color="text.secondary"
-                  sx={{ maxWidth: '700px', mx: 'auto', fontSize: '1.2rem' }}
+                  sx={{ 
+                    maxWidth: '800px', 
+                    mx: 'auto', 
+                    fontSize: '1.3rem',
+                    fontWeight: 400,
+                    lineHeight: 1.6
+                  }}
                 >
-                  Everything you need to transform your study sessions and accelerate your learning journey
+                  Experience the future of education with our cutting-edge AI technology designed to accelerate your learning journey
                 </Typography>
               </Box>
             </motion.div>
@@ -600,48 +519,90 @@ const LandingPage = () => {
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <motion.div
                     variants={itemVariants}
-                    whileHover={{ y: -10 }}
-                    transition={{ duration: 0.3 }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   >
                     <Card 
                       sx={{ 
-                        height: '100%',
+                        height: '450px',
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
                         transition: 'all 0.3s ease',
-                        borderRadius: '20px',
+                        borderRadius: '24px',
                         overflow: 'hidden',
+                        background: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         '&:hover': {
-                          boxShadow: theme.shadows[15]
+                          boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
+                          transform: 'translateY(-4px)'
                         }
                       }}
                     >
-                      <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                        <motion.div
-                          whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.6 }}
-                        >
-                          <Box 
+                      <CardContent sx={{ p: 5, textAlign: 'center', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <Box>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            transition={{ duration: 0.3, ease: "easeOut" }}
+                          >
+                            <Box 
+                              sx={{ 
+                                background: feature.gradient,
+                                borderRadius: '50%',
+                                width: 120,
+                                height: 120,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mx: 'auto',
+                                mb: 4,
+                                boxShadow: `0 12px 40px ${alpha(feature.color, 0.4)}`,
+                                position: 'relative',
+                                '&::before': {
+                                  content: '""',
+                                  position: 'absolute',
+                                  top: -2,
+                                  left: -2,
+                                  right: -2,
+                                  bottom: -2,
+                                  borderRadius: '50%',
+                                  background: feature.gradient,
+                                  zIndex: -1,
+                                  opacity: 0.3,
+                                  filter: 'blur(10px)'
+                                }
+                              }}
+                            >
+                              {React.cloneElement(feature.icon, {
+                                sx: { fontSize: 60, color: '#ffffff' }
+                              })}
+                            </Box>
+                          </motion.div>
+                          <Typography 
+                            variant="h5" 
                             sx={{ 
-                              background: `linear-gradient(135deg, ${feature.color} 0%, ${alpha(feature.color, 0.7)} 100%)`,
-                              borderRadius: '50%',
-                              width: 100,
-                              height: 100,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              mx: 'auto',
+                              fontWeight: 700, 
                               mb: 3,
-                              boxShadow: `0 8px 25px ${alpha(feature.color, 0.3)}`
+                              background: feature.gradient,
+                              backgroundClip: 'text',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent'
                             }}
                           >
-                            {React.cloneElement(feature.icon, {
-                              sx: { fontSize: 50, color: '#ffffff' }
-                            })}
-                          </Box>
-                        </motion.div>
-                        <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-                          {feature.title}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                            {feature.title}
+                          </Typography>
+                        </Box>
+                        <Typography 
+                          variant="body1" 
+                          color="text.secondary" 
+                          sx={{ 
+                            lineHeight: 1.7,
+                            fontSize: '1.1rem',
+                            fontWeight: 400,
+                            textAlign: 'center'
+                          }}
+                        >
                           {feature.description}
                         </Typography>
                       </CardContent>
@@ -655,7 +616,11 @@ const LandingPage = () => {
       </Box>
 
       {/* How It Works Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: '#ffffff' }}>
+      <Box sx={{ 
+        py: { xs: 10, md: 16 }, 
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #e8f4fd 25%, #f0f8ff 50%, #ffffff 100%)',
+        position: 'relative'
+      }}>
         <Container maxWidth="lg">
           <motion.div
             initial="hidden"
@@ -664,98 +629,143 @@ const LandingPage = () => {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
-              <Box sx={{ textAlign: 'center', mb: 8 }}>
+              <Box sx={{ textAlign: 'center', mb: 12 }}>
                 <Typography 
                   variant="h2" 
                   sx={{ 
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                    fontWeight: 700,
-                    mb: 3,
-                    color: theme.palette.primary.main
+                    fontSize: { xs: '3rem', md: '4rem' },
+                    fontWeight: 800,
+                    mb: 4,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
                   }}
                 >
-                  How It Works
+                  Your Learning Journey in Three Steps
                 </Typography>
                 <Typography 
-                  variant="h6" 
+                  variant="h5" 
                   color="text.secondary"
-                  sx={{ maxWidth: '700px', mx: 'auto', fontSize: '1.2rem' }}
+                  sx={{ 
+                    maxWidth: '800px', 
+                    mx: 'auto', 
+                    fontSize: '1.3rem',
+                    fontWeight: 400,
+                    lineHeight: 1.6
+                  }}
                 >
-                  Three simple steps to revolutionize your learning experience
+                  From upload to mastery - our intelligent system guides you through every step of your learning process
                 </Typography>
               </Box>
             </motion.div>
 
-            <Grid container spacing={6} alignItems="center">
+            <Grid container spacing={8} alignItems="center">
               {[
                 {
                   step: '01',
-                  title: 'Upload Your Materials',
-                  description: 'Simply upload your PDF documents, lecture notes, or any study materials you want to work with.',
-                  icon: <Upload sx={{ fontSize: 60 }} />
+                  title: 'Upload & Connect',
+                  description: 'Seamlessly upload your study materials - from PDFs to lecture notes. Our AI instantly analyzes and organizes your content.',
+                  icon: <Upload sx={{ fontSize: 70 }} />,
+                  gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 },
                 {
                   step: '02',
-                  title: 'AI Processes Everything',
-                  description: 'Our advanced AI analyzes your content and creates personalized study materials, flashcards, and quizzes.',
-                  icon: <Psychology sx={{ fontSize: 60 }} />
+                  title: 'AI Intelligence',
+                  description: 'Watch as our advanced AI processes your materials, creating personalized study resources, flashcards, and adaptive quizzes.',
+                  icon: <Psychology sx={{ fontSize: 70 }} />,
+                  gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
                 },
                 {
                   step: '03',
-                  title: 'Study Smarter',
-                  description: 'Access your personalized learning tools, track your progress, and improve your retention with AI-powered insights.',
-                  icon: <TrendingUp sx={{ fontSize: 60 }} />
+                  title: 'Master & Excel',
+                  description: 'Engage with your personalized learning tools, track progress with analytics, and achieve mastery through intelligent insights.',
+                  icon: <TrendingUp sx={{ fontSize: 70 }} />,
+                  gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
                 }
               ].map((step, index) => (
                 <Grid item xs={12} md={4} key={index}>
                   <motion.div
                     variants={itemVariants}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                    <Box sx={{ textAlign: 'center', p: 3 }}>
+                    <Box sx={{ textAlign: 'center', p: 4 }}>
                       <Box 
                         sx={{ 
-                          bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          background: step.gradient,
                           borderRadius: '50%',
-                          width: 120,
-                          height: 120,
+                          width: 160,
+                          height: 160,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           mx: 'auto',
-                          mb: 3,
-                          position: 'relative'
+                          mb: 4,
+                          position: 'relative',
+                          boxShadow: `0 16px 50px ${alpha('#667eea', 0.3)}`,
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: -3,
+                            left: -3,
+                            right: -3,
+                            bottom: -3,
+                            borderRadius: '50%',
+                            background: step.gradient,
+                            zIndex: -1,
+                            opacity: 0.2,
+                            filter: 'blur(15px)'
+                          }
                         }}
                       >
                         <Typography 
                           variant="h3" 
                           sx={{ 
                             position: 'absolute',
-                            top: -10,
-                            right: -10,
-                            bgcolor: theme.palette.primary.main,
+                            top: -15,
+                            right: -15,
+                            background: step.gradient,
                             color: '#ffffff',
                             borderRadius: '50%',
-                            width: 40,
-                            height: 40,
+                            width: 50,
+                            height: 50,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '1rem',
-                            fontWeight: 700
+                            fontSize: '1.2rem',
+                            fontWeight: 800,
+                            boxShadow: '0 8px 25px rgba(0,0,0,0.2)'
                           }}
                         >
                           {step.step}
                         </Typography>
-                        <Box sx={{ color: theme.palette.primary.main }}>
+                        <Box sx={{ color: '#ffffff' }}>
                           {step.icon}
                         </Box>
                       </Box>
-                      <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+                      <Typography 
+                        variant="h4" 
+                        sx={{ 
+                          fontWeight: 700, 
+                          mb: 3,
+                          background: step.gradient,
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent'
+                        }}
+                      >
                         {step.title}
                       </Typography>
-                      <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                      <Typography 
+                        variant="body1" 
+                        color="text.secondary" 
+                        sx={{ 
+                          lineHeight: 1.7,
+                          fontSize: '1.1rem',
+                          fontWeight: 400
+                        }}
+                      >
                         {step.description}
                       </Typography>
                     </Box>
@@ -768,8 +778,46 @@ const LandingPage = () => {
       </Box>
 
       {/* Ask Question Demo Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: 'grey.50' }}>
-        <Container maxWidth="lg">
+      <Box sx={{ 
+        py: { xs: 10, md: 16 }, 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background elements */}
+        <motion.div
+          animate={floatingAnimation}
+          style={{
+            position: 'absolute',
+            top: '10%',
+            left: '5%',
+            width: '200px',
+            height: '200px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 0
+          }}
+        />
+        <motion.div
+          animate={{
+            ...floatingAnimation,
+            transition: { ...floatingAnimation.transition, delay: 2 }
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '10%',
+            right: '5%',
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 0
+          }}
+        />
+        
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -777,24 +825,31 @@ const LandingPage = () => {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
-              <Box sx={{ textAlign: 'center', mb: 8 }}>
+              <Box sx={{ textAlign: 'center', mb: 10 }}>
                 <Typography 
                   variant="h2" 
                   sx={{ 
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                    fontWeight: 700,
-                    mb: 3,
-                    color: theme.palette.primary.main
+                    fontSize: { xs: '3rem', md: '4rem' },
+                    fontWeight: 800,
+                    mb: 4,
+                    color: '#ffffff',
+                    textShadow: '0 4px 20px rgba(0,0,0,0.3)'
                   }}
                 >
-                  Try Our AI Study Assistant
+                  Experience AI-Powered Learning
                 </Typography>
                 <Typography 
-                  variant="h6" 
-                  color="text.secondary"
-                  sx={{ maxWidth: '700px', mx: 'auto', fontSize: '1.2rem' }}
+                  variant="h5" 
+                  sx={{ 
+                    maxWidth: '800px', 
+                    mx: 'auto', 
+                    fontSize: '1.3rem',
+                    fontWeight: 400,
+                    lineHeight: 1.6,
+                    color: 'rgba(255, 255, 255, 0.9)'
+                  }}
                 >
-                  Experience the power of AI-powered learning with our interactive demo
+                  Try our intelligent study assistant and discover how AI can transform your learning experience
                 </Typography>
               </Box>
             </motion.div>
@@ -808,40 +863,49 @@ const LandingPage = () => {
       {/* CTA Section */}
       <Box 
         sx={{ 
-          py: { xs: 8, md: 12 },
-          background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
+          py: { xs: 10, md: 16 },
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.6) 0%, rgba(118, 75, 162, 0.6) 25%, rgba(240, 147, 251, 0.6) 50%, rgba(245, 87, 108, 0.6) 75%, rgba(79, 172, 254, 0.6) 100%)',
+          backgroundSize: '400% 400%',
+          animation: 'gradientShift 20s ease infinite',
           color: '#ffffff',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          '@keyframes gradientShift': {
+            '0%': { backgroundPosition: '0% 50%' },
+            '50%': { backgroundPosition: '100% 50%' },
+            '100%': { backgroundPosition: '0% 50%' }
+          }
         }}
       >
         {/* Animated background elements */}
         <motion.div
-          animate={floatingAnimation}
+          animate={spiralAnimation}
           style={{
             position: 'absolute',
-            top: '20%',
+            top: '15%',
             left: '10%',
-            width: '150px',
-            height: '150px',
+            width: '180px',
+            height: '180px',
             borderRadius: '50%',
             background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(15px)',
             zIndex: 0
           }}
         />
         <motion.div
           animate={{
-            ...floatingAnimation,
-            transition: { ...floatingAnimation.transition, delay: 1.5 }
+            ...pulseAnimation,
+            transition: { ...pulseAnimation.transition, delay: 3 }
           }}
           style={{
             position: 'absolute',
-            bottom: '20%',
+            bottom: '15%',
             right: '10%',
-            width: '100px',
-            height: '100px',
+            width: '120px',
+            height: '120px',
             borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(10px)',
             zIndex: 0
           }}
         />
@@ -858,18 +922,25 @@ const LandingPage = () => {
                 <Typography 
                   variant="h2" 
                   sx={{ 
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                    fontWeight: 700,
-                    mb: 3
+                    fontSize: { xs: '3rem', md: '4rem' },
+                    fontWeight: 800,
+                    mb: 4,
+                    textShadow: '0 4px 20px rgba(0,0,0,0.3)'
                   }}
                 >
                   Ready to Transform Your Learning?
                 </Typography>
                 <Typography 
                   variant="h5" 
-                  sx={{ mb: 6, opacity: 0.9, lineHeight: 1.5 }}
+                  sx={{ 
+                    mb: 8, 
+                    opacity: 0.95, 
+                    lineHeight: 1.6,
+                    fontSize: '1.4rem',
+                    fontWeight: 400
+                  }}
                 >
-                  Join thousands of students who are already learning smarter with AI Study Buddy
+                  Join thousands of students who are already accelerating their learning journey with AI Study Buddy
                 </Typography>
                 <motion.div
                   variants={buttonVariants}
@@ -880,23 +951,25 @@ const LandingPage = () => {
                     variant="contained" 
                     size="large"
                     onClick={() => navigate('/register')}
-                    startIcon={<PlayArrow />}
+                    startIcon={<RocketLaunch />}
                     sx={{ 
-                      bgcolor: '#ffffff',
-                      color: theme.palette.primary.main,
-                      px: 6,
-                      py: 2.5,
-                      fontSize: '1.2rem',
-                      fontWeight: 600,
+                      background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 100%)',
+                      color: '#1a1a1a',
+                      px: 8,
+                      py: 3,
+                      fontSize: '1.3rem',
+                      fontWeight: 700,
                       borderRadius: '50px',
-                      boxShadow: '0 8px 25px rgba(0,0,0,0.2)',
+                      boxShadow: '0 16px 50px rgba(255, 215, 0, 0.5)',
+                      textTransform: 'none',
                       '&:hover': {
-                        bgcolor: alpha('#ffffff', 0.9),
-                        boxShadow: '0 12px 35px rgba(0,0,0,0.3)'
+                        background: 'linear-gradient(45deg, #FFA500 0%, #FFD700 100%)',
+                        boxShadow: '0 20px 60px rgba(255, 215, 0, 0.7)',
+                        transform: 'translateY(-3px)'
                       }
                     }}
                   >
-                    Start Learning Today
+                    Start Your Journey Today
                   </Button>
                 </motion.div>
               </Box>

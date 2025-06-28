@@ -228,38 +228,93 @@ const AskQuestionDemo = () => {
     <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
       <Card 
         sx={{ 
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
-          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-          borderRadius: 3
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          borderRadius: '24px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
+          overflow: 'hidden',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 3s ease infinite',
+            '@keyframes gradientShift': {
+              '0%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+              '100%': { backgroundPosition: '0% 50%' }
+            }
+          }
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <CardContent sx={{ p: 5 }}>
+          <Box sx={{ textAlign: 'center', mb: 5 }}>
             <Box 
               sx={{ 
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 borderRadius: '50%',
-                width: 80,
-                height: 80,
+                width: 100,
+                height: 100,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mx: 'auto',
-                mb: 2
+                mb: 3,
+                boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)',
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: -3,
+                  left: -3,
+                  right: -3,
+                  bottom: -3,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  zIndex: -1,
+                  opacity: 0.3,
+                  filter: 'blur(10px)'
+                }
               }}
             >
-              <SmartToy sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+              <SmartToy sx={{ fontSize: 50, color: '#ffffff' }} />
             </Box>
-            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: theme.palette.primary.main }}>
+            <Typography 
+              variant="h3" 
+              sx={{ 
+                fontWeight: 800, 
+                mb: 2, 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
               Ask AI Study Buddy
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto' }}>
-              Try our AI-powered study assistant! Ask any question and get instant, helpful responses.
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ 
+                maxWidth: 600, 
+                mx: 'auto',
+                fontSize: '1.1rem',
+                fontWeight: 400,
+                lineHeight: 1.6
+              }}
+            >
+              Experience the power of AI-powered learning! Ask any question and get instant, intelligent responses.
             </Typography>
           </Box>
 
           <form onSubmit={handleSubmit}>
-            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
               <TextField
                 fullWidth
                 multiline
@@ -271,31 +326,50 @@ const AskQuestionDemo = () => {
                 disabled={loading || isTranscribing}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
+                    borderRadius: '16px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(102, 126, 234, 0.2)',
                     '&:hover fieldset': {
-                      borderColor: theme.palette.primary.main,
+                      borderColor: '#667eea',
+                      borderWidth: '2px'
                     },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#667eea',
+                      borderWidth: '2px'
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: '1.1rem',
+                      fontWeight: 400
+                    }
                   }
                 }}
               />
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {!isRecording ? (
                   <Tooltip title="Click to start recording">
                     <IconButton
                       onClick={startRecording}
                       disabled={loading || isTranscribing}
                       sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        color: theme.palette.primary.main,
+                        width: 60,
+                        height: 60,
+                        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        color: '#ffffff',
+                        borderRadius: '16px',
+                        boxShadow: '0 8px 25px rgba(240, 147, 251, 0.4)',
                         '&:hover': {
-                          bgcolor: alpha(theme.palette.primary.main, 0.2),
+                          background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                          boxShadow: '0 12px 35px rgba(240, 147, 251, 0.6)',
+                          transform: 'translateY(-2px)'
                         },
                         '&:disabled': {
-                          opacity: 0.5
+                          opacity: 0.5,
+                          transform: 'none'
                         }
                       }}
                     >
-                      {isTranscribing ? <CircularProgress size={20} /> : <Mic />}
+                      {isTranscribing ? <CircularProgress size={24} color="inherit" /> : <Mic />}
                     </IconButton>
                   </Tooltip>
                 ) : (
@@ -303,10 +377,16 @@ const AskQuestionDemo = () => {
                     <IconButton
                       onClick={stopRecording}
                       sx={{
-                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                        color: theme.palette.error.main,
+                        width: 60,
+                        height: 60,
+                        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+                        color: '#ffffff',
+                        borderRadius: '16px',
+                        boxShadow: '0 8px 25px rgba(255, 107, 107, 0.4)',
                         '&:hover': {
-                          bgcolor: alpha(theme.palette.error.main, 0.2),
+                          background: 'linear-gradient(135deg, #ee5a24 0%, #ff6b6b 100%)',
+                          boxShadow: '0 12px 35px rgba(255, 107, 107, 0.6)',
+                          transform: 'translateY(-2px)'
                         }
                       }}
                     >
@@ -320,16 +400,20 @@ const AskQuestionDemo = () => {
                   variant="contained"
                   disabled={!question.trim() || loading || isTranscribing}
                   sx={{
-                    minWidth: 60,
-                    height: 56,
-                    borderRadius: 2,
-                    px: 3,
+                    width: 60,
+                    height: 60,
+                    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    color: '#ffffff',
+                    borderRadius: '16px',
+                    boxShadow: '0 8px 25px rgba(79, 172, 254, 0.4)',
                     '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: theme.shadows[8]
+                      background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+                      boxShadow: '0 12px 35px rgba(79, 172, 254, 0.6)',
+                      transform: 'translateY(-2px)'
                     },
                     '&:disabled': {
-                      opacity: 0.6
+                      opacity: 0.5,
+                      transform: 'none'
                     }
                   }}
                 >
@@ -344,19 +428,52 @@ const AskQuestionDemo = () => {
           </form>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 4, 
+                borderRadius: '16px',
+                background: 'rgba(255, 107, 107, 0.1)',
+                border: '1px solid rgba(255, 107, 107, 0.3)',
+                '& .MuiAlert-icon': {
+                  color: '#ff6b6b'
+                }
+              }}
+            >
               {error}
             </Alert>
           )}
 
           {isRecording && (
-            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                mb: 4, 
+                borderRadius: '16px',
+                background: 'rgba(79, 172, 254, 0.1)',
+                border: '1px solid rgba(79, 172, 254, 0.3)',
+                '& .MuiAlert-icon': {
+                  color: '#4facfe'
+                }
+              }}
+            >
               🎤 Recording... {recordingDuration}s - Click the stop button when you're done speaking.
             </Alert>
           )}
 
           {isTranscribing && (
-            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                mb: 4, 
+                borderRadius: '16px',
+                background: 'rgba(240, 147, 251, 0.1)',
+                border: '1px solid rgba(240, 147, 251, 0.3)',
+                '& .MuiAlert-icon': {
+                  color: '#f093fb'
+                }
+              }}
+            >
               🔄 Transcribing your speech...
             </Alert>
           )}
@@ -365,22 +482,58 @@ const AskQuestionDemo = () => {
             <Paper 
               elevation={0}
               sx={{ 
-                p: 3, 
-                bgcolor: alpha(theme.palette.success.main, 0.05),
-                border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
-                borderRadius: 2
+                p: 4, 
+                background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
+                border: '1px solid rgba(67, 233, 123, 0.3)',
+                borderRadius: '20px',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)'
+                }
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <SmartToy sx={{ color: theme.palette.success.main, mr: 1 }} />
-                <Typography variant="h6" sx={{ color: theme.palette.success.main, fontWeight: 600 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Box
+                  sx={{
+                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                    borderRadius: '50%',
+                    width: 40,
+                    height: 40,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 2,
+                    boxShadow: '0 4px 15px rgba(67, 233, 123, 0.4)'
+                  }}
+                >
+                  <SmartToy sx={{ fontSize: 24, color: '#ffffff' }} />
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    fontWeight: 700
+                  }}
+                >
                   AI Response
                 </Typography>
               </Box>
               <Typography 
                 variant="body1" 
                 sx={{ 
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
+                  fontSize: '1.1rem',
+                  fontWeight: 400,
                   whiteSpace: 'pre-wrap'
                 }}
               >
