@@ -96,11 +96,31 @@ try {
 
 // Speech-to-Text routes
 console.log('Attempting to load speech routes...');
+
+// Check if the package is installed
 try {
+  const fs = require('fs');
+  const path = require('path');
+  const packagePath = path.join(__dirname, 'node_modules', '@google-cloud', 'speech');
+  if (fs.existsSync(packagePath)) {
+    console.log('✅ @google-cloud/speech package found in node_modules');
+  } else {
+    console.log('❌ @google-cloud/speech package NOT found in node_modules');
+  }
+} catch (error) {
+  console.log('❌ Error checking for @google-cloud/speech package:', error.message);
+}
+
+try {
+  // First, try to require the Google Cloud Speech package
+  const speech = require('@google-cloud/speech');
+  console.log('✅ @google-cloud/speech package loaded successfully');
+  
+  // Then try to load the speech routes
   const speechRoutes = require('./backend/routes/speech');
-  console.log('Speech routes loaded successfully');
+  console.log('✅ Speech routes loaded successfully');
   app.use('/api/speech', speechRoutes);
-  console.log('Speech routes registered at /api/speech');
+  console.log('✅ Speech routes registered at /api/speech');
 } catch (error) {
   console.log('Speech routes not available:', error.message);
   console.log('Speech routes error details:', error);

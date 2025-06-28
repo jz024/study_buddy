@@ -9,10 +9,11 @@
     "dev:full": "concurrently \"npm run dev\" \"cd frontend && npm start\"",
     "seed": "node backend/seeds/seedDatabase.js",
     "test": "jest",
-    "build": "cd frontend && npm install && npm run build",
+    "build": "npm install && cd frontend && npm install && npm run build",
     "build:prod": "npm run build && node server.js",
-    "heroku-postbuild": "cd frontend && npm install && npm run build",
-    "render-build": "./build-robust.sh"
+    "heroku-postbuild": "npm install && cd frontend && npm install && npm run build",
+    "render-build": "./build-robust.sh",
+    "postinstall": "echo 'Postinstall: Ensuring all dependencies are installed' && npm install --production=false"
   },
   "keywords": [
     "ai",

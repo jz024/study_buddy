@@ -4,10 +4,14 @@ set -e  # Exit on any error
 
 echo "🚀 Building AI Study Buddy for Render (Robust Version)..."
 
+# Install backend dependencies first
+echo "📦 Installing backend dependencies..."
+npm install --production=false
+
 # Navigate to frontend directory
 cd frontend
 
-echo "📦 Installing dependencies..."
+echo "📦 Installing frontend dependencies..."
 npm install --production=false
 
 echo "🔧 Ensuring react-scripts is installed..."
