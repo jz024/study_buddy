@@ -201,29 +201,29 @@ const LandingPage = () => {
           opacity: heroOpacity
         }}
       >
-        <Box
-          sx={{
+      <Box
+        sx={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 25%, rgba(240, 147, 251, 0.8) 50%, rgba(245, 87, 108, 0.8) 75%, rgba(79, 172, 254, 0.8) 100%)',
             backgroundSize: '400% 400%',
             animation: 'gradientShift 15s ease infinite',
-            color: '#ffffff',
+          color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
-            position: 'relative',
-            overflow: 'hidden',
+          position: 'relative',
+          overflow: 'hidden',
             '@keyframes gradientShift': {
               '0%': { backgroundPosition: '0% 50%' },
               '50%': { backgroundPosition: '100% 50%' },
               '100%': { backgroundPosition: '0% 50%' }
             },
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
               background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M40 40v-8h-4v8h-8v4h8v8h4v-8h8v-4h-8zm0-40V0h-4v8h-8v4h8v8h4V12h8V8h-8zM8 40v-8H0v8H0v4h8v8h4v-8h8v-4H8zM8 8V0H0v8H0v4h8v8h4V12h8V8H8z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }
           }}
@@ -303,7 +303,7 @@ const LandingPage = () => {
             }}
           />
 
-          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
             <motion.div
               initial={{ opacity: 0, y: 80 }}
               animate={{ opacity: 1, y: 0 }}
@@ -317,9 +317,9 @@ const LandingPage = () => {
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
                     <AutoAwesome sx={{ fontSize: 60, color: '#FFD700', mr: 2 }} />
-                    <Typography 
-                      variant="h1" 
-                      sx={{ 
+            <Typography 
+              variant="h1" 
+              sx={{ 
                         fontSize: { xs: '3.5rem', sm: '4.5rem', md: '5.5rem', lg: '6.5rem' },
                         fontWeight: 900,
                         background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 25%, #FF6347 50%, #FF1493 75%, #9370DB 100%)',
@@ -335,10 +335,10 @@ const LandingPage = () => {
                           '50%': { backgroundPosition: '100% 50%' },
                           '100%': { backgroundPosition: '0% 50%' }
                         }
-                      }}
-                    >
-                      AI Study Buddy
-                    </Typography>
+              }}
+            >
+              AI Study Buddy
+            </Typography>
                     <AutoAwesome sx={{ fontSize: 60, color: '#FFD700', ml: 2 }} />
                   </Box>
                 </motion.div>
@@ -348,21 +348,21 @@ const LandingPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 1, delay: 0.7 }}
                 >
-                  <Typography 
+            <Typography 
                     variant="h3" 
-                    sx={{ 
-                      mb: 4, 
+              sx={{ 
+                mb: 4, 
                       opacity: 0.95,
                       maxWidth: '800px',
-                      mx: 'auto',
+                mx: 'auto',
                       fontSize: { xs: '1.4rem', md: '1.8rem' },
                       fontWeight: 300,
                       lineHeight: 1.5,
                       textShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                    }}
-                  >
+              }}
+            >
                     Revolutionize your learning with AI-powered intelligence that adapts to your unique study style
-                  </Typography>
+            </Typography>
                 </motion.div>
 
                 <motion.div
@@ -376,12 +376,12 @@ const LandingPage = () => {
                       whileHover="hover"
                       whileTap="tap"
                     >
-                      <Button 
-                        variant="contained" 
-                        size="large"
-                        onClick={() => navigate('/register')}
+              <Button 
+                variant="contained" 
+                size="large"
+                onClick={() => navigate('/register')}
                         startIcon={<RocketLaunch />}
-                        sx={{ 
+                sx={{ 
                           background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 100%)',
                           color: '#1a1a1a',
                           px: 6,
@@ -391,7 +391,7 @@ const LandingPage = () => {
                           borderRadius: '50px',
                           boxShadow: '0 12px 40px rgba(255, 215, 0, 0.4)',
                           textTransform: 'none',
-                          '&:hover': {
+                  '&:hover': {
                             background: 'linear-gradient(45deg, #FFA500 0%, #FFD700 100%)',
                             boxShadow: '0 16px 50px rgba(255, 215, 0, 0.6)',
                             transform: 'translateY(-2px)'
@@ -399,7 +399,7 @@ const LandingPage = () => {
                         }}
                       >
                         Get Started
-                      </Button>
+              </Button>
                     </motion.div>
                     
                     <motion.div
@@ -407,32 +407,32 @@ const LandingPage = () => {
                       whileHover="hover"
                       whileTap="tap"
                     >
-                      <Button 
-                        variant="outlined" 
-                        size="large"
-                        onClick={() => navigate('/login')}
+              <Button 
+                variant="outlined" 
+                size="large"
+                onClick={() => navigate('/login')}
                         startIcon={<Lightbulb />}
-                        sx={{ 
-                          borderColor: '#ffffff',
+                sx={{ 
+                  borderColor: '#ffffff',
                           borderWidth: 3,
-                          color: '#ffffff',
+                  color: '#ffffff',
                           px: 6,
                           py: 2.5,
                           fontSize: '1.2rem',
-                          fontWeight: 600,
+                  fontWeight: 600,
                           borderRadius: '50px',
                           textTransform: 'none',
                           backdropFilter: 'blur(10px)',
-                          '&:hover': {
+                  '&:hover': {
                             borderColor: '#FFD700',
                             bgcolor: 'rgba(255, 215, 0, 0.1)',
                             borderWidth: 3,
-                            transform: 'translateY(-2px)'
-                          }
-                        }}
-                      >
-                        Sign In
-                      </Button>
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                Sign In
+              </Button>
                     </motion.div>
                   </Box>
                 </motion.div>
@@ -448,12 +448,12 @@ const LandingPage = () => {
                       Discover More
                     </Typography>
                     <ArrowDownward sx={{ fontSize: 40, opacity: 0.7 }} />
-                  </Box>
+            </Box>
                 </motion.div>
-              </Box>
+          </Box>
             </motion.div>
-          </Container>
-        </Box>
+        </Container>
+      </Box>
       </motion.div>
 
       {/* Features Section */}
@@ -484,9 +484,9 @@ const LandingPage = () => {
           >
             <motion.div variants={itemVariants}>
               <Box sx={{ textAlign: 'center', mb: 12 }}>
-                <Typography 
-                  variant="h2" 
-                  sx={{ 
+            <Typography 
+              variant="h2" 
+              sx={{ 
                     fontSize: { xs: '3rem', md: '4rem' },
                     fontWeight: 800,
                     mb: 4,
@@ -497,10 +497,10 @@ const LandingPage = () => {
                   }}
                 >
                   Powerful Features for Modern Learning
-                </Typography>
-                <Typography 
+            </Typography>
+            <Typography 
                   variant="h5" 
-                  color="text.secondary"
+              color="text.secondary"
                   sx={{ 
                     maxWidth: '800px', 
                     mx: 'auto', 
@@ -510,31 +510,31 @@ const LandingPage = () => {
                   }}
                 >
                   Experience the future of education with our cutting-edge AI technology designed to accelerate your learning journey
-                </Typography>
-              </Box>
+            </Typography>
+          </Box>
             </motion.div>
 
-            <Grid container spacing={4}>
-              {features.map((feature, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
                   <motion.div
                     variants={itemVariants}
                     whileHover={{ y: -8, scale: 1.02 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                   >
-                    <Card 
-                      sx={{ 
+                <Card 
+                  sx={{ 
                         height: '450px',
                         width: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        transition: 'all 0.3s ease',
+                    transition: 'all 0.3s ease',
                         borderRadius: '24px',
                         overflow: 'hidden',
                         background: 'rgba(255, 255, 255, 0.9)',
                         backdropFilter: 'blur(20px)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
-                        '&:hover': {
+                    '&:hover': {
                           boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
                           transform: 'translateY(-4px)'
                         }
@@ -546,16 +546,16 @@ const LandingPage = () => {
                             whileHover={{ scale: 1.05 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
                           >
-                            <Box 
-                              sx={{ 
+                    <Box 
+                      sx={{ 
                                 background: feature.gradient,
-                                borderRadius: '50%',
+                        borderRadius: '50%',
                                 width: 120,
                                 height: 120,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mx: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mx: 'auto',
                                 mb: 4,
                                 boxShadow: `0 12px 40px ${alpha(feature.color, 0.4)}`,
                                 position: 'relative',
@@ -572,12 +572,12 @@ const LandingPage = () => {
                                   opacity: 0.3,
                                   filter: 'blur(10px)'
                                 }
-                              }}
-                            >
-                              {React.cloneElement(feature.icon, {
+                      }}
+                    >
+                      {React.cloneElement(feature.icon, {
                                 sx: { fontSize: 60, color: '#ffffff' }
-                              })}
-                            </Box>
+                      })}
+                    </Box>
                           </motion.div>
                           <Typography 
                             variant="h5" 
@@ -590,8 +590,8 @@ const LandingPage = () => {
                               WebkitTextFillColor: 'transparent'
                             }}
                           >
-                            {feature.title}
-                          </Typography>
+                      {feature.title}
+                    </Typography>
                         </Box>
                         <Typography 
                           variant="body1" 
@@ -603,14 +603,14 @@ const LandingPage = () => {
                             textAlign: 'center'
                           }}
                         >
-                          {feature.description}
-                        </Typography>
-                      </CardContent>
-                    </Card>
+                      {feature.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
                   </motion.div>
-                </Grid>
-              ))}
-            </Grid>
+              </Grid>
+            ))}
+          </Grid>
           </motion.div>
         </Container>
       </Box>
@@ -630,9 +630,9 @@ const LandingPage = () => {
           >
             <motion.div variants={itemVariants}>
               <Box sx={{ textAlign: 'center', mb: 12 }}>
-                <Typography 
-                  variant="h2" 
-                  sx={{ 
+            <Typography 
+              variant="h2" 
+              sx={{ 
                     fontSize: { xs: '3rem', md: '4rem' },
                     fontWeight: 800,
                     mb: 4,
@@ -747,19 +747,19 @@ const LandingPage = () => {
                       <Typography 
                         variant="h4" 
                         sx={{ 
-                          fontWeight: 700, 
-                          mb: 3,
+                fontWeight: 700,
+                mb: 3,
                           background: step.gradient,
                           backgroundClip: 'text',
                           WebkitBackgroundClip: 'text',
                           WebkitTextFillColor: 'transparent'
-                        }}
-                      >
+              }}
+            >
                         {step.title}
-                      </Typography>
-                      <Typography 
+            </Typography>
+            <Typography 
                         variant="body1" 
-                        color="text.secondary" 
+              color="text.secondary"
                         sx={{ 
                           lineHeight: 1.7,
                           fontSize: '1.1rem',
@@ -850,11 +850,11 @@ const LandingPage = () => {
                   }}
                 >
                   Try our intelligent study assistant and discover how AI can transform your learning experience
-                </Typography>
-              </Box>
+            </Typography>
+          </Box>
             </motion.div>
             <motion.div variants={itemVariants}>
-              <AskQuestionDemo />
+          <AskQuestionDemo />
             </motion.div>
           </motion.div>
         </Container>
@@ -918,19 +918,19 @@ const LandingPage = () => {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography 
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography 
                   variant="h2" 
-                  sx={{ 
+              sx={{ 
                     fontSize: { xs: '3rem', md: '4rem' },
                     fontWeight: 800,
                     mb: 4,
                     textShadow: '0 4px 20px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  Ready to Transform Your Learning?
-                </Typography>
-                <Typography 
+              }}
+            >
+              Ready to Transform Your Learning?
+            </Typography>
+            <Typography 
                   variant="h5" 
                   sx={{ 
                     mb: 8, 
@@ -941,18 +941,18 @@ const LandingPage = () => {
                   }}
                 >
                   Join thousands of students who are already accelerating their learning journey with AI Study Buddy
-                </Typography>
+            </Typography>
                 <motion.div
                   variants={buttonVariants}
                   whileHover="hover"
                   whileTap="tap"
                 >
-                  <Button 
-                    variant="contained" 
-                    size="large"
-                    onClick={() => navigate('/register')}
+            <Button 
+              variant="contained" 
+              size="large"
+              onClick={() => navigate('/register')}
                     startIcon={<RocketLaunch />}
-                    sx={{ 
+              sx={{ 
                       background: 'linear-gradient(45deg, #FFD700 0%, #FFA500 100%)',
                       color: '#1a1a1a',
                       px: 8,
@@ -962,7 +962,7 @@ const LandingPage = () => {
                       borderRadius: '50px',
                       boxShadow: '0 16px 50px rgba(255, 215, 0, 0.5)',
                       textTransform: 'none',
-                      '&:hover': {
+                '&:hover': {
                         background: 'linear-gradient(45deg, #FFA500 0%, #FFD700 100%)',
                         boxShadow: '0 20px 60px rgba(255, 215, 0, 0.7)',
                         transform: 'translateY(-3px)'
@@ -970,9 +970,9 @@ const LandingPage = () => {
                     }}
                   >
                     Start Your Journey Today
-                  </Button>
+            </Button>
                 </motion.div>
-              </Box>
+          </Box>
             </motion.div>
           </motion.div>
         </Container>

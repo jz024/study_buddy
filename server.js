@@ -150,6 +150,31 @@ app.get('/api/speech-test', (req, res) => {
   });
 });
 
+// Add a debug endpoint to check Google Cloud configuration
+app.get('/api/speech-debug', (req, res) => {
+  const hasProjectId = !!process.env.GOOGLE_CLOUD_PROJECT_ID;
+  const hasKeyFile = !!process.env.GOOGLE_CLOUD_KEY_FILE;
+  const hasPrivateKey = !!process.env.GOOGLE_CLOUD_PRIVATE_KEY;
+  const hasClientEmail = !!process.env.GOOGLE_CLOUD_CLIENT_EMAIL;
+  
+  res.json({
+    success: true,
+    message: 'Google Cloud Speech-to-Text Configuration Debug',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    config: {
+      hasProjectId,
+      hasKeyFile,
+      hasPrivateKey,
+      hasClientEmail,
+      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID ? 'Set' : 'Not set',
+      keyFile: process.env.GOOGLE_CLOUD_KEY_FILE || 'Not set',
+      clientEmail: process.env.GOOGLE_CLOUD_CLIENT_EMAIL || 'Not set'
+    },
+    status: (hasProjectId && (hasKeyFile || (hasPrivateKey && hasClientEmail))) ? 'Configured' : 'Not configured'
+  });
+});
+
 // API Routes
 if (routes) {
   app.use('/api', routes);
@@ -206,18 +231,30 @@ app.post('/api/auth/signout', (req, res) => {
   });
 });
 
-// Serve static files from React build in production
+// Error handling middleware (simplified)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something broke!' });
+});
+
+// 404 handler for API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ 
+    success: false, 
+    message: 'API route not found',
+    path: req.originalUrl
+  });
+});
+
+// Serve static files from React build in production (MOVED TO END)
 if (process.env.NODE_ENV === 'production') {
   try {
     const publicPath = path.join(__dirname, 'public');
     const indexPath = path.join(publicPath, 'index.html');
     
-    // Check if public directory and index.html exist
     if (require('fs').existsSync(indexPath)) {
-      // Serve static files from the public directory (created by build script)
       app.use(express.static(publicPath));
-      
-      // Handle React routing, return all requests to React app
+      // React catch-all: must be LAST
       app.get('*', (req, res) => {
         res.sendFile(indexPath);
       });
@@ -259,21 +296,6 @@ if (process.env.NODE_ENV === 'production') {
     });
   });
 }
-
-// Error handling middleware (simplified)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something broke!' });
-});
-
-// 404 handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: 'API route not found',
-    path: req.originalUrl
-  });
-});
 
 // Start server
 const server = app.listen(PORT, () => {
