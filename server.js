@@ -175,6 +175,36 @@ app.get('/api/speech-debug', (req, res) => {
   });
 });
 
+// Add a test endpoint that directly tests the speech service
+app.get('/api/speech-test-service', async (req, res) => {
+  try {
+    const speechService = require('./backend/services/speechToTextService');
+    const testBuffer = Buffer.from('test audio data');
+    
+    const result = await speechService.transcribeAudio(
+      testBuffer,
+      'audio/webm;codecs=opus',
+      48000,
+      'en-US'
+    );
+    
+    res.json({
+      success: true,
+      message: 'Speech service test completed',
+      result: result,
+      hasClient: !!speechService.client,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: 'Speech service test failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // API Routes
 if (routes) {
   app.use('/api', routes);

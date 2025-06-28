@@ -12,17 +12,29 @@ try {
 
 class SpeechToTextService {
   constructor() {
+    console.log('🔧 Initializing SpeechToTextService...');
+    console.log('🔧 Environment variables check:');
+    console.log('  - GOOGLE_CLOUD_PROJECT_ID:', !!process.env.GOOGLE_CLOUD_PROJECT_ID);
+    console.log('  - GOOGLE_CLOUD_KEY_FILE:', !!process.env.GOOGLE_CLOUD_KEY_FILE);
+    console.log('  - GOOGLE_CLOUD_PRIVATE_KEY:', !!process.env.GOOGLE_CLOUD_PRIVATE_KEY);
+    console.log('  - GOOGLE_CLOUD_CLIENT_EMAIL:', !!process.env.GOOGLE_CLOUD_CLIENT_EMAIL);
+    
     // Check if Google Cloud credentials are available
     if (process.env.GOOGLE_CLOUD_PROJECT_ID && (process.env.GOOGLE_CLOUD_KEY_FILE || process.env.GOOGLE_CLOUD_PRIVATE_KEY)) {
-      this.client = new speech.SpeechClient({
-        projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-        keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE || null,
-        credentials: process.env.GOOGLE_CLOUD_PRIVATE_KEY ? {
-          private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
-          client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
-        } : undefined
-      });
-      console.log('✅ Google Cloud Speech-to-Text client initialized');
+      try {
+        this.client = new speech.SpeechClient({
+          projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+          keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE || null,
+          credentials: process.env.GOOGLE_CLOUD_PRIVATE_KEY ? {
+            private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
+            client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+          } : undefined
+        });
+        console.log('✅ Google Cloud Speech-to-Text client initialized successfully');
+      } catch (error) {
+        console.log('❌ Failed to initialize Google Cloud client:', error.message);
+        this.client = null;
+      }
     } else {
       console.log('⚠️ Google Cloud credentials not found - using mock responses');
       this.client = null;
