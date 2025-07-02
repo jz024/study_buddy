@@ -3,7 +3,6 @@ const multer = require('multer');
 const speechToTextService = require('../services/speechToTextService');
 const router = express.Router();
 
-// Test endpoint to verify the route is working
 router.get('/test', (req, res) => {
   res.json({
     success: true,
@@ -12,14 +11,12 @@ router.get('/test', (req, res) => {
   });
 });
 
-// Configure multer for audio file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Accept audio files
     if (file.mimetype.startsWith('audio/')) {
       cb(null, true);
     } else {
@@ -28,8 +25,6 @@ const upload = multer({
   }
 });
 
-// POST /api/speech/transcribe
-// Transcribe uploaded audio file
 router.post('/transcribe', upload.single('audio'), async (req, res) => {
   console.log('Transcribe endpoint hit');
   try {
@@ -72,8 +67,6 @@ router.post('/transcribe', upload.single('audio'), async (req, res) => {
   }
 });
 
-// POST /api/speech/transcribe-base64
-// Transcribe base64 encoded audio
 router.post('/transcribe-base64', async (req, res) => {
   try {
     const { audioData, encoding, sampleRateHertz, languageCode = 'en-US' } = req.body;
@@ -85,7 +78,6 @@ router.post('/transcribe-base64', async (req, res) => {
       });
     }
 
-    // Convert base64 to buffer
     const audioBuffer = Buffer.from(audioData, 'base64');
 
     const result = await speechToTextService.transcribeAudio(

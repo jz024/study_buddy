@@ -1,32 +1,22 @@
 const speech = require('@google-cloud/speech');
 
-// Try to load audio conversion service, but don't fail if it's not available
 let audioConversionService;
 try {
   audioConversionService = require('./audioConversionService');
-  console.log('✅ Audio conversion service loaded successfully');
+  console.log('Audio conversion service loaded successfully');
 } catch (error) {
-  console.log('⚠️ Audio conversion service not available:', error.message);
+  console.log('Audio conversion service not available:', error.message);
   audioConversionService = null;
 }
 
 class SpeechToTextService {
   constructor() {
-    console.log('🔧 Initializing SpeechToTextService...');
-    console.log('🔧 Environment variables check:');
-    console.log('  - GOOGLE_CLOUD_PROJECT_ID:', !!process.env.GOOGLE_CLOUD_PROJECT_ID);
-    console.log('  - GOOGLE_CLOUD_KEY_FILE:', !!process.env.GOOGLE_CLOUD_KEY_FILE);
-    console.log('  - GOOGLE_CLOUD_PRIVATE_KEY:', !!process.env.GOOGLE_CLOUD_PRIVATE_KEY);
-    console.log('  - GOOGLE_CLOUD_CLIENT_EMAIL:', !!process.env.GOOGLE_CLOUD_CLIENT_EMAIL);
-    
-    // Initialize Google Cloud Speech client
     this.client = new speech.SpeechClient({
       projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-      keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE || null,
-      credentials: process.env.GOOGLE_CLOUD_PRIVATE_KEY ? {
+      credentials: {
         private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY.replace(/\\n/g, '\n'),
         client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
-      } : undefined
+      }
     });
   }
 
