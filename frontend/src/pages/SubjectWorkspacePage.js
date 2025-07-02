@@ -37,7 +37,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getSubjectConfig, isSubjectAISupported } from '../data/subjectConfigs';
-import aiServiceFactory from '../services/aiServiceFactory';
+import { getSubjectService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 
 const SubjectWorkspacePage = () => {
@@ -52,7 +52,6 @@ const SubjectWorkspacePage = () => {
   const [aiService, setAiService] = useState(null);
   const [error, setError] = useState(null);
 
-  // Get subject configuration
   const currentSubject = getSubjectConfig(subjectId);
 
   useEffect(() => {
@@ -61,10 +60,9 @@ const SubjectWorkspacePage = () => {
       return;
     }
 
-    // Initialize AI service if supported
     if (isSubjectAISupported(subjectId)) {
       try {
-        const service = aiServiceFactory.getService(subjectId);
+        const service = getSubjectService(subjectId);
         setAiService(service);
       } catch (error) {
         console.error('Failed to initialize AI service:', error);
@@ -158,7 +156,6 @@ const SubjectWorkspacePage = () => {
     const userQuestion = question;
     setQuestion('');
     
-    // Add user question to chat
     setChatHistory(prev => [...prev, { type: 'user', content: userQuestion }]);
     
     try {

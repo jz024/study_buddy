@@ -1,36 +1,23 @@
-import BaseAIService from '../aiService';
 import axios from 'axios';
 
-class MathematicsAIService extends BaseAIService {
-  constructor() {
-    super('mathematics');
-    this.subjectContext = {
-      name: 'Mathematics',
-      description: 'Algebra, Calculus, Geometry',
-      expertise: [
-        'Algebraic concepts and problem solving',
-        'Calculus',
-        'Geometry and trigonometry',
-        'Statistics and probability',
-        'Linear algebra',
-        'Mathematical proofs',
-        'Mathematical modeling',
-        'Applied mathematics'
-      ],
-      systemPrompt: `You are an expert mathematics tutor specializing in algebra, calculus, geometry, 
-      and advanced mathematical concepts. You excel at breaking down complex mathematical problems 
-      into understandable steps, providing clear explanations, and helping students develop problem-solving 
-      skills. Always show step-by-step solutions and explain the mathematical reasoning behind each step. 
-      Use mathematical notation when appropriate and ensure accuracy in all calculations.`
-    };
-  }
+const mathematicsService = {
+  subjectId: 'mathematics',
+  name: 'Mathematics',
+  description: 'Algebra, Calculus, Geometry',
+  
+  // Subject-specific system prompt
+  systemPrompt: `You are an expert mathematics tutor specializing in algebra, calculus, geometry, 
+  and advanced mathematical concepts. You excel at breaking down complex mathematical problems 
+  into understandable steps, providing clear explanations, and helping students develop problem-solving 
+  skills. Always show step-by-step solutions and explain the mathematical reasoning behind each step. 
+  Use mathematical notation when appropriate and ensure accuracy in all calculations.`,
 
   async askQuestion(question, context = '') {
     try {
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: question,
-        subjectId: 'mathematics',
-        context: context || this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: context || this.systemPrompt
       });
 
       if (response.data.success) {
@@ -42,7 +29,7 @@ class MathematicsAIService extends BaseAIService {
       console.error('Mathematics AI Service Error:', error);
       throw error;
     }
-  }
+  },
 
   async generateQuiz(topic, difficulty = 'medium', questionCount = 10) {
     try {
@@ -50,7 +37,7 @@ class MathematicsAIService extends BaseAIService {
       Create ${questionCount} multiple choice questions with 4 options each. 
       Include the correct answer and a step-by-step solution for each question.
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Format the response as JSON with the following structure:
       {
@@ -65,19 +52,17 @@ class MathematicsAIService extends BaseAIService {
         ]
       }`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'mathematics',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
         try {
-          // Try to parse the response as JSON
           const quizData = JSON.parse(response.data.data.aiResponse);
           return quizData;
         } catch (parseError) {
-          // If parsing fails, return a structured response
           return {
             title: `${topic} Quiz`,
             questions: [],
@@ -91,7 +76,7 @@ class MathematicsAIService extends BaseAIService {
       console.error('Mathematics Quiz Generation Error:', error);
       throw error;
     }
-  }
+  },
 
   async generateFlashcards(content, cardCount = 10) {
     try {
@@ -99,7 +84,7 @@ class MathematicsAIService extends BaseAIService {
       
       Content: ${content}
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Format the response as JSON with the following structure:
       {
@@ -111,19 +96,17 @@ class MathematicsAIService extends BaseAIService {
         ]
       }`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'mathematics',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
         try {
-          // Try to parse the response as JSON
           const flashcardData = JSON.parse(response.data.data.aiResponse);
           return flashcardData.flashcards || flashcardData;
         } catch (parseError) {
-          // If parsing fails, return a structured response
           return [{
             front: "Sample Question",
             back: response.data.data.aiResponse
@@ -136,7 +119,7 @@ class MathematicsAIService extends BaseAIService {
       console.error('Mathematics Flashcard Generation Error:', error);
       throw error;
     }
-  }
+  },
 
   async analyzeNotes(notes) {
     try {
@@ -144,7 +127,7 @@ class MathematicsAIService extends BaseAIService {
       
       Notes: ${notes}
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Provide a comprehensive analysis including:
       1. Key mathematical concepts identified
@@ -153,10 +136,10 @@ class MathematicsAIService extends BaseAIService {
       4. Related topics to explore
       5. Practice recommendations`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'mathematics',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
@@ -169,6 +152,6 @@ class MathematicsAIService extends BaseAIService {
       throw error;
     }
   }
-}
+};
 
-export default MathematicsAIService; 
+export default mathematicsService; 

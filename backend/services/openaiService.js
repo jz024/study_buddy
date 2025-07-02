@@ -3,7 +3,6 @@ const openai = require('../config/openai');
 class OpenAIService {
   async generateChatResponse(messages, context = '') {
     try {
-      // Check if OpenAI client is initialized
       if (!openai) {
         console.log('OpenAI client not initialized - returning placeholder response');
         return {

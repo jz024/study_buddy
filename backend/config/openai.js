@@ -1,6 +1,5 @@
 const { OpenAI } = require('openai');
 
-// Make OpenAI optional - only initialize if API key is provided
 let openai = null;
 
 if (process.env.OPENAI_API_KEY) {

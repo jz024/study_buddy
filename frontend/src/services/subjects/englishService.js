@@ -1,35 +1,23 @@
-import BaseAIService from '../aiService';
 import axios from 'axios';
 
-class EnglishAIService extends BaseAIService {
-  constructor() {
-    super('english');
-    this.subjectContext = {
-      name: 'English',
-      description: 'Literature, Grammar, Writing',
-      expertise: [
-        'English literature analysis',
-        'Grammar rules and usage',
-        'Writing techniques and styles',
-        'Essay writing and composition',
-        'Poetry analysis',
-        'Creative writing',
-        'Academic writing'
-      ],
-      systemPrompt: `You are an expert English tutor specializing in literature, grammar, and writing. 
-      You have deep knowledge of English literature from classical to modern works, grammar rules, 
-      writing techniques, and literary analysis. Provide clear, educational responses that help students 
-      understand complex concepts in English studies. Always include examples and explanations that 
-      enhance learning.`
-    };
-  }
+const englishService = {
+  subjectId: 'english',
+  name: 'English',
+  description: 'Literature, Grammar, Writing',
+  
+  // Subject-specific system prompt
+  systemPrompt: `You are an expert English tutor specializing in literature, grammar, and writing. 
+  You have deep knowledge of English literature from classical to modern works, grammar rules, 
+  writing techniques, and literary analysis. Provide clear, educational responses that help students 
+  understand complex concepts in English studies. Always include examples and explanations that 
+  enhance learning.`,
 
   async askQuestion(question, context = '') {
     try {
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: question,
-        subjectId: 'english',
-        context: context || this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: context || this.systemPrompt
       });
 
       if (response.data.success) {
@@ -41,7 +29,7 @@ class EnglishAIService extends BaseAIService {
       console.error('English AI Service Error:', error);
       throw error;
     }
-  }
+  },
 
   async generateQuiz(topic, difficulty = 'medium', questionCount = 10) {
     try {
@@ -49,7 +37,7 @@ class EnglishAIService extends BaseAIService {
       Create ${questionCount} multiple choice questions with 4 options each. 
       Include the correct answer and a brief explanation for each question.
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Format the response as JSON with the following structure:
       {
@@ -64,19 +52,17 @@ class EnglishAIService extends BaseAIService {
         ]
       }`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'english',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
         try {
-          // Try to parse the response as JSON
           const quizData = JSON.parse(response.data.data.aiResponse);
           return quizData;
         } catch (parseError) {
-          // If parsing fails, return a structured response
           return {
             title: `${topic} Quiz`,
             questions: [],
@@ -90,7 +76,7 @@ class EnglishAIService extends BaseAIService {
       console.error('English Quiz Generation Error:', error);
       throw error;
     }
-  }
+  },
 
   async generateFlashcards(content, cardCount = 10) {
     try {
@@ -98,7 +84,7 @@ class EnglishAIService extends BaseAIService {
       
       Content: ${content}
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Format the response as JSON with the following structure:
       {
@@ -110,19 +96,17 @@ class EnglishAIService extends BaseAIService {
         ]
       }`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'english',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
         try {
-          // Try to parse the response as JSON
           const flashcardData = JSON.parse(response.data.data.aiResponse);
           return flashcardData.flashcards || flashcardData;
         } catch (parseError) {
-          // If parsing fails, return a structured response
           return [{
             front: "Sample Question",
             back: response.data.data.aiResponse
@@ -135,7 +119,7 @@ class EnglishAIService extends BaseAIService {
       console.error('English Flashcard Generation Error:', error);
       throw error;
     }
-  }
+  },
 
   async analyzeNotes(notes) {
     try {
@@ -143,7 +127,7 @@ class EnglishAIService extends BaseAIService {
       
       Notes: ${notes}
       
-      Context: ${this.subjectContext.systemPrompt}
+      Context: ${this.systemPrompt}
       
       Provide a comprehensive analysis including:
       1. Key concepts identified
@@ -151,10 +135,10 @@ class EnglishAIService extends BaseAIService {
       3. Related topics to explore
       4. Study recommendations`;
 
-      const response = await axios.post(`${this.baseUrl}/api/chat`, {
+      const response = await axios.post('/api/chat', {
         message: prompt,
-        subjectId: 'english',
-        context: this.subjectContext.systemPrompt
+        subjectId: this.subjectId,
+        context: this.systemPrompt
       });
 
       if (response.data.success) {
@@ -167,6 +151,6 @@ class EnglishAIService extends BaseAIService {
       throw error;
     }
   }
-}
+};
 
-export default EnglishAIService; 
+export default englishService; 

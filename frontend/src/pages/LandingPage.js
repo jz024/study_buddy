@@ -26,7 +26,7 @@ import {
   RocketLaunch
 } from '@mui/icons-material';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import AskQuestionDemo from '../components/common/AskQuestionDemo';
+import AskQuestionDemo from '../components/AskQuestionDemo';
 
 const LandingPage = () => {
   const theme = useTheme();
