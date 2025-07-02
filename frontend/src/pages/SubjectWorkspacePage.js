@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Container,
@@ -309,9 +310,19 @@ const SubjectWorkspacePage = () => {
                       <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.primary.main }}>
                         {msg.type === 'user' ? 'You' : 'AI Tutor'}
                       </Typography>
-                      <Typography variant="body1">
-                        {msg.content}
-                      </Typography>
+                      <Box sx={{ 
+                        '& p': { mb: 1 },
+                        '& ul, & ol': { pl: 2, mb: 1 },
+                        '& li': { mb: 0.5 },
+                        '& strong': { fontWeight: 600 },
+                        '& h1, & h2, & h3, & h4, & h5, & h6': { 
+                          fontWeight: 600, 
+                          mb: 1, 
+                          mt: 2 
+                        }
+                      }}>
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </Box>
                     </Box>
                   ))}
                 </Box>
