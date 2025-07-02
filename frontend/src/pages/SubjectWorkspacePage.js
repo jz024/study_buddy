@@ -157,17 +157,41 @@ const SubjectWorkspacePage = () => {
     const userQuestion = question;
     setQuestion('');
     
-    setChatHistory(prev => [...prev, { type: 'user', content: userQuestion }]);
+    setChatHistory(prev => [{ type: 'user', content: userQuestion }, ...prev]);
+    
+    // Scroll to top after adding user message
+    setTimeout(() => {
+      const chatHistory = document.getElementById('chat-history');
+      if (chatHistory) {
+        chatHistory.scrollTop = 0;
+      }
+    }, 100);
     
     try {
       const response = await aiService.askQuestion(userQuestion);
-      setChatHistory(prev => [...prev, { type: 'ai', content: response }]);
+      setChatHistory(prev => [{ type: 'ai', content: response }, ...prev]);
+      
+      // Scroll to top after adding AI response
+      setTimeout(() => {
+        const chatHistory = document.getElementById('chat-history');
+        if (chatHistory) {
+          chatHistory.scrollTop = 0;
+        }
+      }, 100);
     } catch (error) {
       console.error('Failed to get AI response:', error);
-      setChatHistory(prev => [...prev, { 
+      setChatHistory(prev => [{ 
         type: 'ai', 
         content: 'Sorry, I encountered an error. Please try again later.' 
-      }]);
+      }, ...prev]);
+      
+      // Scroll to top after adding error message
+      setTimeout(() => {
+        const chatHistory = document.getElementById('chat-history');
+        if (chatHistory) {
+          chatHistory.scrollTop = 0;
+        }
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -295,7 +319,7 @@ const SubjectWorkspacePage = () => {
               </Box>
               
               {chatHistory.length > 0 && (
-                <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                <Box sx={{ maxHeight: 400, overflowY: 'auto' }} id="chat-history">
                   {chatHistory.map((msg, idx) => (
                     <Box
                       key={idx}

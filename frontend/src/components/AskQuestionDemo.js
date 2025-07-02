@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Card,
@@ -22,7 +23,7 @@ const API_BASE_URL = ''; // Use relative URLs since proxy is configured
 const AskQuestionDemo = () => {
   const theme = useTheme();
   const [question, setQuestion] = useState('');
-  const [response, setResponse] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -191,20 +192,51 @@ const AskQuestionDemo = () => {
       return;
     }
 
+    const userQuestion = question.trim();
+    setQuestion('');
+    setChatHistory(prev => [{ type: 'user', content: userQuestion }, ...prev]);
+    
+    // Scroll to top after adding user message
+    setTimeout(() => {
+      const chatHistory = document.getElementById('demo-chat-history');
+      if (chatHistory) {
+        chatHistory.scrollTop = 0;
+      }
+    }, 100);
+    
     setLoading(true);
     setError('');
-    setResponse('');
 
     try {
       const requestUrl = `${API_BASE_URL}/api/chat`;
-      const requestData = { message: question.trim(), subjectId: null };
+      const requestData = { message: userQuestion, subjectId: null };
       
       const result = await axios.post(requestUrl, requestData);
 
       if (result.data.success) {
-        setResponse(result.data.data.aiResponse);
+        setChatHistory(prev => [{ type: 'ai', content: result.data.data.aiResponse }, ...prev]);
+        
+        // Scroll to top after adding AI response
+        setTimeout(() => {
+          const chatHistory = document.getElementById('demo-chat-history');
+          if (chatHistory) {
+            chatHistory.scrollTop = 0;
+          }
+        }, 100);
       } else {
         setError(result.data.message || 'Failed to get response from AI');
+        setChatHistory(prev => [{ 
+          type: 'ai', 
+          content: 'Sorry, I encountered an error. Please try again later.' 
+        }, ...prev]);
+        
+        // Scroll to top after adding error message
+        setTimeout(() => {
+          const chatHistory = document.getElementById('demo-chat-history');
+          if (chatHistory) {
+            chatHistory.scrollTop = 0;
+          }
+        }, 100);
       }
     } catch (err) {
       if (err.response?.status === 400) {
@@ -214,10 +246,22 @@ const AskQuestionDemo = () => {
         } else {
           setError(errorData.message || 'Invalid request');
         }
+        setChatHistory(prev => [{ 
+          type: 'ai', 
+          content: 'Sorry, I encountered an error. Please try again later.' 
+        }, ...prev]);
       } else if (err.code === 'ECONNREFUSED') {
         setError('Cannot connect to AI service. Please check if the server is running.');
+        setChatHistory(prev => [{ 
+          type: 'ai', 
+          content: 'Cannot connect to AI service. Please check if the server is running.' 
+        }, ...prev]);
       } else {
         setError('Failed to connect to AI service. Please try again.');
+        setChatHistory(prev => [{ 
+          type: 'ai', 
+          content: 'Failed to connect to AI service. Please try again.' 
+        }, ...prev]);
       }
     } finally {
       setLoading(false);
@@ -478,68 +522,94 @@ const AskQuestionDemo = () => {
             </Alert>
           )}
 
-          {response && (
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 4, 
-                background: 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
-                border: '1px solid rgba(67, 233, 123, 0.3)',
-                borderRadius: '20px',
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)'
-                }
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <Box
-                  sx={{
-                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                    borderRadius: '50%',
-                    width: 40,
-                    height: 40,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    mr: 2,
-                    boxShadow: '0 4px 15px rgba(67, 233, 123, 0.4)'
-                  }}
-                >
-                  <SmartToy sx={{ fontSize: 24, color: '#ffffff' }} />
-                </Box>
-                <Typography 
-                  variant="h5" 
+          {chatHistory.length > 0 && (
+            <Box sx={{ maxHeight: 500, overflowY: 'auto', mb: 2 }} id="demo-chat-history">
+              {chatHistory.map((msg, idx) => (
+                <Paper 
+                  key={idx}
+                  elevation={0}
                   sx={{ 
-                    background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    fontWeight: 700
+                    p: 3, 
+                    mb: 2,
+                    background: msg.type === 'user' 
+                      ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
+                      : 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
+                    border: msg.type === 'user'
+                      ? '1px solid rgba(102, 126, 234, 0.3)'
+                      : '1px solid rgba(67, 233, 123, 0.3)',
+                    borderRadius: '16px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '3px',
+                      background: msg.type === 'user'
+                        ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+                        : 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)'
+                    }
                   }}
                 >
-                  AI Response
-                </Typography>
-              </Box>
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  lineHeight: 1.7,
-                  fontSize: '1.1rem',
-                  fontWeight: 400,
-                  whiteSpace: 'pre-wrap'
-                }}
-              >
-                {response}
-              </Typography>
-            </Paper>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box
+                      sx={{
+                        background: msg.type === 'user'
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                        borderRadius: '50%',
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 2,
+                        boxShadow: msg.type === 'user'
+                          ? '0 4px 15px rgba(102, 126, 234, 0.4)'
+                          : '0 4px 15px rgba(67, 233, 123, 0.4)'
+                      }}
+                    >
+                      {msg.type === 'user' ? (
+                        <Typography sx={{ fontSize: 16, color: '#ffffff', fontWeight: 600 }}>
+                          U
+                        </Typography>
+                      ) : (
+                        <SmartToy sx={{ fontSize: 20, color: '#ffffff' }} />
+                      )}
+                    </Box>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        background: msg.type === 'user'
+                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                          : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 700
+                      }}
+                    >
+                      {msg.type === 'user' ? 'You' : 'AI Response'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ 
+                    '& p': { mb: 1 },
+                    '& ul, & ol': { pl: 2, mb: 1 },
+                    '& li': { mb: 0.5 },
+                    '& strong': { fontWeight: 600 },
+                    '& h1, & h2, & h3, & h4, & h5, & h6': { 
+                      fontWeight: 600, 
+                      mb: 1, 
+                      mt: 2 
+                    }
+                  }}>
+                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
           )}
         </CardContent>
       </Card>
