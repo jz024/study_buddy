@@ -1,6 +1,5 @@
 const { body, param, validationResult } = require('express-validator');
 
-// Validation result handler
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -13,7 +12,6 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// User validation rules
 const validateUserRegistration = [
   body('name')
     .trim()
@@ -40,7 +38,6 @@ const validateUserLogin = [
   handleValidationErrors
 ];
 
-// Subject validation rules
 const validateSubject = [
   body('name')
     .trim()
@@ -58,7 +55,6 @@ const validateSubject = [
   handleValidationErrors
 ];
 
-// Note validation rules
 const validateNote = [
   body('title')
     .trim()
@@ -75,7 +71,6 @@ const validateNote = [
   handleValidationErrors
 ];
 
-// Simplified chat validation rules - no auth required for testing
 const validateChatMessage = [
   body('message')
     .trim()
@@ -93,7 +88,6 @@ const validateChatMessage = [
   handleValidationErrors
 ];
 
-// Object ID validation
 const validateObjectId = [
   param('id')
     .isLength({ min: 1 })

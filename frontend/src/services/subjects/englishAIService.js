@@ -11,11 +11,8 @@ class EnglishAIService extends BaseAIService {
         'English literature analysis',
         'Grammar rules and usage',
         'Writing techniques and styles',
-        'Vocabulary and etymology',
-        'Literary devices and figures of speech',
         'Essay writing and composition',
         'Poetry analysis',
-        'Drama and theater',
         'Creative writing',
         'Academic writing'
       ],

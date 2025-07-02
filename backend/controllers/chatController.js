@@ -1,11 +1,8 @@
-// Simple Chat Controller - Placeholder implementation
-
 const openaiService = require('../services/openaiService');
 
 const sendMessage = async (req, res) => {
   try {
     const { message, subjectId } = req.body;
-    
     if (!message) {
       return res.status(400).json({
         success: false,
@@ -13,7 +10,6 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    // Use OpenAI service to generate response
     const messages = [{ role: 'user', content: message }];
     const response = await openaiService.generateChatResponse(messages);
 

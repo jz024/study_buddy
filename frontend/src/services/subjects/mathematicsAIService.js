@@ -9,14 +9,12 @@ class MathematicsAIService extends BaseAIService {
       description: 'Algebra, Calculus, Geometry',
       expertise: [
         'Algebraic concepts and problem solving',
-        'Calculus (differential and integral)',
+        'Calculus',
         'Geometry and trigonometry',
         'Statistics and probability',
         'Linear algebra',
         'Mathematical proofs',
-        'Number theory',
         'Mathematical modeling',
-        'Mathematical logic',
         'Applied mathematics'
       ],
       systemPrompt: `You are an expert mathematics tutor specializing in algebra, calculus, geometry, 
