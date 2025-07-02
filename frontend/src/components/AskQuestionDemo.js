@@ -28,7 +28,6 @@ const AskQuestionDemo = () => {
   const [error, setError] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [recordingStartTime, setRecordingStartTime] = useState(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -42,6 +41,16 @@ const AskQuestionDemo = () => {
       }
     };
   }, []);
+
+  // Reusable scroll to top function
+  const scrollToTop = () => {
+    setTimeout(() => {
+      const chatHistory = document.getElementById('demo-chat-history');
+      if (chatHistory) {
+        chatHistory.scrollTop = 0;
+      }
+    }, 100);
+  };
 
   const startRecording = async () => {
     try {
@@ -101,11 +110,9 @@ const AskQuestionDemo = () => {
         await transcribeAudio(audioBlob);
       };
 
-      // Start recording with smaller timeslice for more frequent data
-      mediaRecorderRef.current.start(100); // Get data every 100ms
+      mediaRecorderRef.current.start(100);
       setIsRecording(true);
       setError('');
-      setRecordingStartTime(Date.now());
       setRecordingDuration(0);
       
       // Start timer to track recording duration
@@ -131,7 +138,6 @@ const AskQuestionDemo = () => {
         setError('Please record for at least 1 second.');
         setIsRecording(false);
         setRecordingDuration(0);
-        setRecordingStartTime(null);
         mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
         return;
       }
@@ -140,7 +146,6 @@ const AskQuestionDemo = () => {
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
       setRecordingDuration(0);
-      setRecordingStartTime(null);
     }
   };
 
@@ -195,14 +200,7 @@ const AskQuestionDemo = () => {
     const userQuestion = question.trim();
     setQuestion('');
     setChatHistory(prev => [{ type: 'user', content: userQuestion }, ...prev]);
-    
-    // Scroll to top after adding user message
-    setTimeout(() => {
-      const chatHistory = document.getElementById('demo-chat-history');
-      if (chatHistory) {
-        chatHistory.scrollTop = 0;
-      }
-    }, 100);
+    scrollToTop();
     
     setLoading(true);
     setError('');
@@ -215,28 +213,14 @@ const AskQuestionDemo = () => {
 
       if (result.data.success) {
         setChatHistory(prev => [{ type: 'ai', content: result.data.data.aiResponse }, ...prev]);
-        
-        // Scroll to top after adding AI response
-        setTimeout(() => {
-          const chatHistory = document.getElementById('demo-chat-history');
-          if (chatHistory) {
-            chatHistory.scrollTop = 0;
-          }
-        }, 100);
+        scrollToTop();
       } else {
         setError(result.data.message || 'Failed to get response from AI');
         setChatHistory(prev => [{ 
           type: 'ai', 
           content: 'Sorry, I encountered an error. Please try again later.' 
         }, ...prev]);
-        
-        // Scroll to top after adding error message
-        setTimeout(() => {
-          const chatHistory = document.getElementById('demo-chat-history');
-          if (chatHistory) {
-            chatHistory.scrollTop = 0;
-          }
-        }, 100);
+        scrollToTop();
       }
     } catch (err) {
       if (err.response?.status === 400) {
@@ -277,24 +261,7 @@ const AskQuestionDemo = () => {
           border: '1px solid rgba(255, 255, 255, 0.3)',
           borderRadius: '24px',
           boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
-          overflow: 'hidden',
-          position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)',
-            backgroundSize: '400% 400%',
-            animation: 'gradientShift 3s ease infinite',
-            '@keyframes gradientShift': {
-              '0%': { backgroundPosition: '0% 50%' },
-              '50%': { backgroundPosition: '100% 50%' },
-              '100%': { backgroundPosition: '0% 50%' }
-            }
-          }
+          overflow: 'hidden'
         }}
       >
         <CardContent sx={{ p: 5 }}>
@@ -310,21 +277,7 @@ const AskQuestionDemo = () => {
                 justifyContent: 'center',
                 mx: 'auto',
                 mb: 3,
-                boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)',
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: -3,
-                  left: -3,
-                  right: -3,
-                  bottom: -3,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  zIndex: -1,
-                  opacity: 0.3,
-                  filter: 'blur(10px)'
-                }
+                boxShadow: '0 12px 40px rgba(102, 126, 234, 0.4)'
               }}
             >
               <SmartToy sx={{ fontSize: 50, color: '#ffffff' }} />
@@ -334,10 +287,7 @@ const AskQuestionDemo = () => {
               sx={{ 
                 fontWeight: 800, 
                 mb: 2, 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                color: '#667eea'
               }}
             >
               Ask AI Study Buddy
@@ -372,19 +322,11 @@ const AskQuestionDemo = () => {
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '16px',
                     background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(102, 126, 234, 0.2)',
                     '&:hover fieldset': {
-                      borderColor: '#667eea',
-                      borderWidth: '2px'
+                      borderColor: '#667eea'
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: '#667eea',
-                      borderWidth: '2px'
-                    },
-                    '& .MuiInputBase-input': {
-                      fontSize: '1.1rem',
-                      fontWeight: 400
+                      borderColor: '#667eea'
                     }
                   }
                 }}
@@ -403,13 +345,10 @@ const AskQuestionDemo = () => {
                         borderRadius: '16px',
                         boxShadow: '0 8px 25px rgba(240, 147, 251, 0.4)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
-                          boxShadow: '0 12px 35px rgba(240, 147, 251, 0.6)',
-                          transform: 'translateY(-2px)'
+                          opacity: 0.9
                         },
                         '&:disabled': {
-                          opacity: 0.5,
-                          transform: 'none'
+                          opacity: 0.5
                         }
                       }}
                     >
@@ -428,9 +367,7 @@ const AskQuestionDemo = () => {
                         borderRadius: '16px',
                         boxShadow: '0 8px 25px rgba(255, 107, 107, 0.4)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #ee5a24 0%, #ff6b6b 100%)',
-                          boxShadow: '0 12px 35px rgba(255, 107, 107, 0.6)',
-                          transform: 'translateY(-2px)'
+                          opacity: 0.9
                         }
                       }}
                     >
@@ -451,13 +388,10 @@ const AskQuestionDemo = () => {
                     borderRadius: '16px',
                     boxShadow: '0 8px 25px rgba(79, 172, 254, 0.4)',
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
-                      boxShadow: '0 12px 35px rgba(79, 172, 254, 0.6)',
-                      transform: 'translateY(-2px)'
+                      opacity: 0.9
                     },
                     '&:disabled': {
-                      opacity: 0.5,
-                      transform: 'none'
+                      opacity: 0.5
                     }
                   }}
                 >
@@ -532,43 +466,27 @@ const AskQuestionDemo = () => {
                     p: 3, 
                     mb: 2,
                     background: msg.type === 'user' 
-                      ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
-                      : 'linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%)',
+                      ? 'rgba(102, 126, 234, 0.1)'
+                      : 'rgba(67, 233, 123, 0.1)',
                     border: msg.type === 'user'
                       ? '1px solid rgba(102, 126, 234, 0.3)'
                       : '1px solid rgba(67, 233, 123, 0.3)',
-                    borderRadius: '16px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: '3px',
-                      background: msg.type === 'user'
-                        ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
-                        : 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)'
-                    }
+                    borderRadius: '16px'
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Box
                       sx={{
                         background: msg.type === 'user'
-                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                          : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                          ? '#667eea'
+                          : '#43e97b',
                         borderRadius: '50%',
                         width: 32,
                         height: 32,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        mr: 2,
-                        boxShadow: msg.type === 'user'
-                          ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                          : '0 4px 15px rgba(67, 233, 123, 0.4)'
+                        mr: 2
                       }}
                     >
                       {msg.type === 'user' ? (
@@ -582,12 +500,7 @@ const AskQuestionDemo = () => {
                     <Typography 
                       variant="h6" 
                       sx={{ 
-                        background: msg.type === 'user'
-                          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                          : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
+                        color: msg.type === 'user' ? '#667eea' : '#43e97b',
                         fontWeight: 700
                       }}
                     >
