@@ -13,12 +13,16 @@ import {
   useTheme,
   alpha,
   IconButton,
-  Tooltip
+  Tooltip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
-import { Send, SmartToy, Mic, MicOff, Stop } from '@mui/icons-material';
+import { Send, SmartToy, Mic, MicOff, Stop } from '@mui/icons-material' ;
 import axios from 'axios';
 
-const API_BASE_URL = ''; // Use relative URLs since proxy is configured
+const API_BASE_URL = '';
 
 const AskQuestionDemo = () => {
   const theme = useTheme();
@@ -29,11 +33,11 @@ const AskQuestionDemo = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  const [selectedModel, setSelectedModel] = useState('openai');
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const recordingTimerRef = useRef(null);
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (recordingTimerRef.current) {
@@ -42,7 +46,6 @@ const AskQuestionDemo = () => {
     };
   }, []);
 
-  // Reusable scroll to top function
   const scrollToTop = () => {
     setTimeout(() => {
       const chatHistory = document.getElementById('demo-chat-history');
@@ -54,7 +57,6 @@ const AskQuestionDemo = () => {
 
   const startRecording = async () => {
     try {
-      // Request audio with better quality settings
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           echoCancellation: true,
@@ -65,7 +67,6 @@ const AskQuestionDemo = () => {
         } 
       });
       
-      // Try different audio formats in order of preference
       const formats = [
         'audio/webm;codecs=opus',
         'audio/webm',
@@ -84,7 +85,7 @@ const AskQuestionDemo = () => {
       if (selectedFormat) {
         mediaRecorderRef.current = new MediaRecorder(stream, { 
           mimeType: selectedFormat,
-          audioBitsPerSecond: 128000 // Higher quality
+          audioBitsPerSecond: 128000 
         });
       } else {
         mediaRecorderRef.current = new MediaRecorder(stream);
@@ -101,7 +102,6 @@ const AskQuestionDemo = () => {
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current.mimeType || 'audio/webm' });
         
-        // Check if audio is too short
         if (audioBlob.size < 1000) {
           setError('Recording too short. Please speak for at least 1-2 seconds.');
           return;
@@ -115,7 +115,6 @@ const AskQuestionDemo = () => {
       setError('');
       setRecordingDuration(0);
       
-      // Start timer to track recording duration
       recordingTimerRef.current = setInterval(() => {
         setRecordingDuration(prev => prev + 1);
       }, 1000);
@@ -127,13 +126,11 @@ const AskQuestionDemo = () => {
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
-      // Clear the recording timer
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
         recordingTimerRef.current = null;
       }
       
-      // Check minimum recording duration
       if (recordingDuration < 1) {
         setError('Please record for at least 1 second.');
         setIsRecording(false);
@@ -152,16 +149,15 @@ const AskQuestionDemo = () => {
   const transcribeAudio = async (audioBlob) => {
     setIsTranscribing(true);
     try {
-      // Convert audio blob to base64
       const reader = new FileReader();
       reader.onload = async () => {
-        const base64Audio = reader.result.split(',')[1]; // Remove data URL prefix
+        const base64Audio = reader.result.split(',')[1];
 
         const requestUrl = `${API_BASE_URL}/api/speech/transcribe-base64`;
         const requestData = {
           audioData: base64Audio,
           languageCode: 'en-US',
-          encoding: audioBlob.type // Send the audio format
+          encoding: audioBlob.type 
         };
 
         try {
@@ -207,18 +203,23 @@ const AskQuestionDemo = () => {
 
     try {
       const requestUrl = `${API_BASE_URL}/api/chat`;
-      const requestData = { message: userQuestion, subjectId: null };
+      const requestData = { message: userQuestion, subjectId: null, model: selectedModel };
       
       const result = await axios.post(requestUrl, requestData);
 
       if (result.data.success) {
-        setChatHistory(prev => [{ type: 'ai', content: result.data.data.aiResponse }, ...prev]);
+        setChatHistory(prev => [{ 
+          type: 'ai', 
+          content: result.data.data.aiResponse,
+          model: result.data.data.model 
+        }, ...prev]);
         scrollToTop();
       } else {
         setError(result.data.message || 'Failed to get response from AI');
         setChatHistory(prev => [{ 
           type: 'ai', 
-          content: 'Sorry, I encountered an error. Please try again later.' 
+          content: 'Sorry, I encountered an error. Please try again later.',
+          model: selectedModel
         }, ...prev]);
         scrollToTop();
       }
@@ -232,19 +233,22 @@ const AskQuestionDemo = () => {
         }
         setChatHistory(prev => [{ 
           type: 'ai', 
-          content: 'Sorry, I encountered an error. Please try again later.' 
+          content: 'Sorry, I encountered an error. Please try again later.',
+          model: selectedModel
         }, ...prev]);
       } else if (err.code === 'ECONNREFUSED') {
         setError('Cannot connect to AI service. Please check if the server is running.');
         setChatHistory(prev => [{ 
           type: 'ai', 
-          content: 'Cannot connect to AI service. Please check if the server is running.' 
+          content: 'Cannot connect to AI service. Please check if the server is running.',
+          model: selectedModel
         }, ...prev]);
       } else {
         setError('Failed to connect to AI service. Please try again.');
         setChatHistory(prev => [{ 
           type: 'ai', 
-          content: 'Failed to connect to AI service. Please try again.' 
+          content: 'Failed to connect to AI service. Please try again.',
+          model: selectedModel
         }, ...prev]);
       }
     } finally {
@@ -305,6 +309,33 @@ const AskQuestionDemo = () => {
             >
               Experience the power of AI-powered learning! Ask any question and get instant, intelligent responses.
             </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel>Language Model</InputLabel>
+              <Select
+                value={selectedModel}
+                label="Language Model"
+                onChange={(e) => setSelectedModel(e.target.value)}
+                disabled={loading || isTranscribing}
+                sx={{
+                  borderRadius: '12px',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(102, 126, 234, 0.3)'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#667eea'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#667eea'
+                  }
+                }}
+              >
+                <MenuItem value="openai">OpenAI GPT-3.5</MenuItem>
+                <MenuItem value="llama">Llama 3.3 70B</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
 
           <form onSubmit={handleSubmit}>
@@ -504,7 +535,7 @@ const AskQuestionDemo = () => {
                         fontWeight: 700
                       }}
                     >
-                      {msg.type === 'user' ? 'You' : 'AI Response'}
+                      {msg.type === 'user' ? 'You' : `AI Response (${msg.model === 'llama' ? 'Llama' : 'GPT'})`}
                     </Typography>
                   </Box>
                   <Box sx={{ 

@@ -1,8 +1,9 @@
 const openaiService = require('../services/openaiService');
+const llamaService = require('../services/llamaService');
 
 const sendMessage = async (req, res) => {
   try {
-    const { message, subjectId } = req.body;
+    const { message, subjectId, model = 'openai' } = req.body;
     if (!message) {
       return res.status(400).json({
         success: false,
@@ -11,7 +12,13 @@ const sendMessage = async (req, res) => {
     }
 
     const messages = [{ role: 'user', content: message }];
-    const response = await openaiService.generateChatResponse(messages);
+    
+    let response;
+    if (model === 'llama') {
+      response = await llamaService.generateChatResponse(messages);
+    } else {
+      response = await openaiService.generateChatResponse(messages);
+    }
 
     const result = {
       success: true,
@@ -20,7 +27,8 @@ const sendMessage = async (req, res) => {
         aiResponse: response.content,
         timestamp: new Date().toISOString(),
         subjectId: subjectId || null,
-        tokensUsed: response.tokensUsed
+        tokensUsed: response.tokensUsed,
+        model: model
       }
     };
 
