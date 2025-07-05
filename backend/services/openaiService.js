@@ -21,8 +21,6 @@ class OpenAIService {
         messages: [systemMessage, ...messages],
         max_tokens: 1000,
         temperature: 0.7,
-        top_p: 0.1,
-        max_tokens: 1000
       });
 
       return {
