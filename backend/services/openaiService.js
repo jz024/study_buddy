@@ -20,7 +20,9 @@ class OpenAIService {
         model: 'gpt-3.5-turbo',
         messages: [systemMessage, ...messages],
         max_tokens: 1000,
-        temperature: 0.7
+        temperature: 0.7,
+        top_p: 0.1,
+        max_tokens: 1000
       });
 
       return {
@@ -35,7 +37,6 @@ class OpenAIService {
 
   async generateFlashcards(content, count = 5) {
     try {
-      // Check if OpenAI client is initialized
       if (!openai) {
         console.log('OpenAI client not initialized - returning placeholder flashcards');
         return [
