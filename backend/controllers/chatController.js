@@ -1,5 +1,6 @@
 const openaiService = require('../services/openaiService');
 const llamaService = require('../services/llamaService');
+const mistralService = require('../services/mistralService');
 
 const sendMessage = async (req, res) => {
   try {
@@ -16,6 +17,8 @@ const sendMessage = async (req, res) => {
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);
+    } else if (model === 'mistral') {
+      response = await mistralService.generateChatResponse(messages);
     } else {
       response = await openaiService.generateChatResponse(messages);
     }

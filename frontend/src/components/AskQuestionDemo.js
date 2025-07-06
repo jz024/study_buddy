@@ -334,6 +334,7 @@ const AskQuestionDemo = () => {
               >
                 <MenuItem value="openai">OpenAI GPT-3.5</MenuItem>
                 <MenuItem value="llama">Llama 3.3 70B</MenuItem>
+                <MenuItem value="mistral">Mistral Large</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -535,7 +536,7 @@ const AskQuestionDemo = () => {
                         fontWeight: 700
                       }}
                     >
-                      {msg.type === 'user' ? 'You' : `AI Response (${msg.model === 'llama' ? 'Llama' : 'GPT'})`}
+                      {msg.type === 'user' ? 'You' : `AI Response (${msg.model === 'llama' ? 'Llama' : msg.model === 'mistral' ? 'Mistral' : 'GPT'})`}
                     </Typography>
                   </Box>
                   <Box sx={{ 
