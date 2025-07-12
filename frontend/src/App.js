@@ -9,6 +9,9 @@ import DashboardPage from './pages/DashboardPage';
 import UserProfilePage from './pages/UserProfilePage';
 import SubjectWorkspacePage from './pages/SubjectWorkspacePage';
 
+// Components
+import ModelTesting from './components/ModelTesting';
+
 function App() {
   return (
     <Routes>
@@ -21,6 +24,9 @@ function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/profile" element={<UserProfilePage />} />
       <Route path="/subject/:subjectId" element={<SubjectWorkspacePage />} />
+      
+      {/* Testing Route */}
+      <Route path="/testing" element={<ModelTesting />} />
       
       {/* Catch all route - redirect to home */}
       <Route path="*" element={<LandingPage />} />
