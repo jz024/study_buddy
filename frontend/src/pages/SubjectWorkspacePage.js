@@ -51,6 +51,7 @@ const SubjectWorkspacePage = () => {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('openai');
   const [error, setError] = useState(null);
 
   const currentSubject = getSubjectConfig(subjectId);
@@ -74,17 +75,15 @@ const SubjectWorkspacePage = () => {
     if (!currentUser || !subjectId) return;
 
     try {
-      // Create a new chat for this subject
       const response = await axios.post('/api/chats', {
         user_id: currentUser.uid,
         subject: subjectId,
-        llm: 'openai', // Default to OpenAI for now
+        llm: selectedModel,
         title: `${currentSubject.name} Chat`
       });
 
       if (response.data.success) {
         setCurrentChatId(response.data.chat.id);
-        // Load existing messages if any
         loadChatHistory(response.data.chat.id);
       }
     } catch (error) {
@@ -182,6 +181,32 @@ const SubjectWorkspacePage = () => {
     setError(null);
   };
 
+  const handleModelChange = async (newModel) => {
+    if (newModel === selectedModel) return;
+    
+    setSelectedModel(newModel);
+    setError(null);
+    
+    if (currentUser && subjectId) {
+      try {
+        const response = await axios.post('/api/chats', {
+          user_id: currentUser.uid,
+          subject: subjectId,
+          llm: newModel,
+          title: `${currentSubject.name} Chat (${newModel === 'openai' ? 'GPT' : 'Llama'})`
+        });
+
+        if (response.data.success) {
+          setCurrentChatId(response.data.chat.id);
+          setChatHistory([]); 
+        }
+      } catch (error) {
+        console.error('Failed to switch model:', error);
+        setError('Failed to switch model. Please try again.');
+      }
+    }
+  };
+
   const handleAskQuestion = async () => {
     if (!question.trim() || !currentChatId) return;
     
@@ -191,7 +216,6 @@ const SubjectWorkspacePage = () => {
     
     setChatHistory(prev => [{ type: 'user', content: userQuestion }, ...prev]);
     
-    // Scroll to top after adding user message
     setTimeout(() => {
       const chatHistory = document.getElementById('chat-history');
       if (chatHistory) {
@@ -310,6 +334,11 @@ const SubjectWorkspacePage = () => {
         </DialogTitle>
         
         <DialogContent sx={{ pt: 3 }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
           {selectedFunction.id === 'ask-questions' && (
             <Box>
               <Typography variant="body1" sx={{ mb: 3 }}>
@@ -332,6 +361,31 @@ const SubjectWorkspacePage = () => {
                     />
                   ))}
                 </Box>
+              </Box>
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  AI Model:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip
+                    label="OpenAI GPT-3.5"
+                    color={selectedModel === 'openai' ? 'primary' : 'default'}
+                    variant={selectedModel === 'openai' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('openai')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                  <Chip
+                    label="Llama 3.3 70B"
+                    color={selectedModel === 'llama' ? 'primary' : 'default'}
+                    variant={selectedModel === 'llama' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('llama')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  Switching models will start a new conversation
+                </Typography>
               </Box>
               
               <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
@@ -374,7 +428,7 @@ const SubjectWorkspacePage = () => {
                       }}
                     >
                       <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, color: theme.palette.primary.main }}>
-                        {msg.type === 'user' ? 'You' : 'AI Tutor'}
+                        {msg.type === 'user' ? 'You' : `AI Tutor (${selectedModel === 'openai' ? 'GPT' : 'Llama'})`}
                       </Typography>
                       <Box sx={{ 
                         '& p': { mb: 1 },
