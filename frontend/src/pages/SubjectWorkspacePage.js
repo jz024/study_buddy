@@ -38,8 +38,8 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getSubjectConfig, isSubjectAISupported } from '../data/subjectConfigs';
-import { getSubjectService } from '../services';
 import { useAuth } from '../contexts/AuthContext';
+import axios from 'axios';
 
 const SubjectWorkspacePage = () => {
   const theme = useTheme();
@@ -50,7 +50,7 @@ const SubjectWorkspacePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
-  const [aiService, setAiService] = useState(null);
+  const [currentChatId, setCurrentChatId] = useState(null);
   const [error, setError] = useState(null);
 
   const currentSubject = getSubjectConfig(subjectId);
@@ -61,16 +61,48 @@ const SubjectWorkspacePage = () => {
       return;
     }
 
-    if (isSubjectAISupported(subjectId)) {
-      try {
-        const service = getSubjectService(subjectId);
-        setAiService(service);
-      } catch (error) {
-        console.error('Failed to initialize AI service:', error);
-        setError('AI service not available for this subject');
-      }
+    if (!currentUser) {
+      setError('Please sign in to use chat features');
+      return;
     }
-  }, [subjectId, currentSubject, navigate]);
+
+    // Initialize chat for the current subject
+    initializeChat();
+  }, [subjectId, currentSubject, currentUser, navigate]);
+
+  const initializeChat = async () => {
+    if (!currentUser || !subjectId) return;
+
+    try {
+      // Create a new chat for this subject
+      const response = await axios.post('/api/chats', {
+        user_id: currentUser.uid,
+        subject: subjectId,
+        llm: 'gpt-3.5-turbo', // Default to GPT for now
+        title: `${currentSubject.name} Chat`
+      });
+
+      if (response.data.success) {
+        setCurrentChatId(response.data.chat_id);
+        // Load existing messages if any
+        loadChatHistory(response.data.chat_id);
+      }
+    } catch (error) {
+      console.error('Failed to initialize chat:', error);
+      setError('Failed to initialize chat. Please try again.');
+    }
+  };
+
+  const loadChatHistory = async (chatId) => {
+    try {
+      const response = await axios.get(`/api/chats/${chatId}/messages`);
+      if (response.data.success) {
+        setChatHistory(response.data.messages || []);
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+    }
+  };
 
   const functions = [
     {
@@ -151,7 +183,7 @@ const SubjectWorkspacePage = () => {
   };
 
   const handleAskQuestion = async () => {
-    if (!question.trim() || !aiService) return;
+    if (!question.trim() || !currentChatId) return;
     
     setIsLoading(true);
     const userQuestion = question;
@@ -168,8 +200,15 @@ const SubjectWorkspacePage = () => {
     }, 100);
     
     try {
-      const response = await aiService.askQuestion(userQuestion);
-      setChatHistory(prev => [{ type: 'ai', content: response }, ...prev]);
+      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+        sender: 'user',
+        content: userQuestion
+      });
+
+      if (response.data.success) {
+        // Add the AI response to chat history
+        setChatHistory(prev => [{ type: 'ai', content: response.data.aiResponse }, ...prev]);
+      }
       
       // Scroll to top after adding AI response
       setTimeout(() => {
@@ -198,12 +237,15 @@ const SubjectWorkspacePage = () => {
   };
 
   const handleStartQuiz = async () => {
-    if (!aiService) return;
+    if (!currentChatId) return;
     
     try {
       setIsLoading(true);
-      const quiz = await aiService.generateQuiz('general', 'medium', 10);
-      console.log('Generated quiz:', quiz);
+      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+        sender: 'user',
+        content: 'Generate a quiz on general topics with medium difficulty and 10 questions.'
+      });
+      console.log('Generated quiz:', response.data);
       // TODO: Navigate to quiz page or show quiz
       alert('Quiz generated! (Check console for details)');
     } catch (error) {
@@ -215,13 +257,16 @@ const SubjectWorkspacePage = () => {
   };
 
   const handleGenerateFlashcards = async () => {
-    if (!aiService) return;
+    if (!currentChatId) return;
     
     try {
       setIsLoading(true);
       const sampleContent = `Sample ${currentSubject.name} content for flashcard generation.`;
-      const flashcards = await aiService.generateFlashcards(sampleContent, 10);
-      console.log('Generated flashcards:', flashcards);
+      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+        sender: 'user',
+        content: `Generate 10 flashcards from this content: "${sampleContent}". Each flashcard should be a question-answer pair.`
+      });
+      console.log('Generated flashcards:', response.data);
       // TODO: Navigate to flashcard page or show flashcards
       alert('Flashcards generated! (Check console for details)');
     } catch (error) {
