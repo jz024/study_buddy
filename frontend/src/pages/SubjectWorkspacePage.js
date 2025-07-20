@@ -78,14 +78,14 @@ const SubjectWorkspacePage = () => {
       const response = await axios.post('/api/chats', {
         user_id: currentUser.uid,
         subject: subjectId,
-        llm: 'gpt-3.5-turbo', // Default to GPT for now
+        llm: 'openai', // Default to OpenAI for now
         title: `${currentSubject.name} Chat`
       });
 
       if (response.data.success) {
-        setCurrentChatId(response.data.chat_id);
+        setCurrentChatId(response.data.chat.id);
         // Load existing messages if any
-        loadChatHistory(response.data.chat_id);
+        loadChatHistory(response.data.chat.id);
       }
     } catch (error) {
       console.error('Failed to initialize chat:', error);
