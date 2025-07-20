@@ -22,7 +22,7 @@ import {
 import { Send, SmartToy, Mic, MicOff, Stop } from '@mui/icons-material' ;
 import axios from 'axios';
 
-const API_BASE_URL = '';
+const API_BASE_URL = 'http://localhost:5001';
 
 const AskQuestionDemo = () => {
   const theme = useTheme();
@@ -334,7 +334,6 @@ const AskQuestionDemo = () => {
               >
                 <MenuItem value="openai">OpenAI GPT-3.5</MenuItem>
                 <MenuItem value="llama">Llama 3.3 70B</MenuItem>
-                <MenuItem value="mistral">Mistral Large</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -536,7 +535,7 @@ const AskQuestionDemo = () => {
                         fontWeight: 700
                       }}
                     >
-                      {msg.type === 'user' ? 'You' : `AI Response (${msg.model === 'llama' ? 'Llama' : msg.model === 'mistral' ? 'Mistral' : 'GPT'})`}
+                      {msg.type === 'user' ? 'You' : `AI Response (${msg.model === 'llama' ? 'Llama' : 'GPT'})`}
                     </Typography>
                   </Box>
                   <Box sx={{ 

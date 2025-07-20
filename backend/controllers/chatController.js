@@ -1,30 +1,25 @@
 const openaiService = require('../services/openaiService');
 const llamaService = require('../services/llamaService');
-const mistralService = require('../services/mistralService');
-const { testQuestions } = require('../data/testQuestions');
-const simpleEvaluator = require('../services/simpleEvaluator');
+
 
 const sendMessage = async (req, res) => {
   try {
-    const { message, subjectId, model = 'openai' } = req.body;
-    if (!message) {
+    const { message, subjectId, model = 'openai', history } = req.body;
+    if (!message && (!history || !Array.isArray(history) || history.length === 0)) {
       return res.status(400).json({
         success: false,
-        message: 'Message is required'
+        message: 'Message or history is required'
       });
     }
-
-    const messages = [{ role: 'user', content: message }];
-    
+    const messages = (history && Array.isArray(history) && history.length > 0)
+      ? history
+      : [{ role: 'user', content: message }];
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);
-    } else if (model === 'mistral') {
-      response = await mistralService.generateChatResponse(messages);
     } else {
       response = await openaiService.generateChatResponse(messages);
     }
-
     const result = {
       success: true,
       data: {
@@ -36,9 +31,7 @@ const sendMessage = async (req, res) => {
         model: model
       }
     };
-
     res.json(result);
-
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({
@@ -48,157 +41,132 @@ const sendMessage = async (req, res) => {
   }
 };
 
-// Comprehensive Testing: Compare all 3 models
-const runComprehensiveTest = async (req, res) => {
-  try {
-    console.log(`🧪 Running comprehensive test: OpenAI vs Llama vs Mistral`);
-    
-    const results = [];
-    const models = ['openai', 'llama', 'mistral'];
-    
-    for (const question of testQuestions) {
-      console.log(`Testing question ${question.id}: ${question.question.substring(0, 50)}...`);
-      
-      const questionResults = {
-        questionId: question.id,
-        question: question.question,
-        subject: question.subject,
-        difficulty: question.difficulty,
-        expectedKeywords: question.expectedKeywords,
-        models: {}
-      };
-      
-      // Test all 3 models
-      for (const model of models) {
-        const response = await getModelResponse(question.question, model);
-        const evaluation = simpleEvaluator.evaluateResponse(response.content, question.expectedKeywords);
-        
-        questionResults.models[model] = {
-          model: model,
-          response: response.content,
-          responseTime: response.responseTime,
-          tokensUsed: response.tokensUsed,
-          evaluation: evaluation
-        };
-      }
-      
-      results.push(questionResults);
-      
-      // Small delay between requests
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    // Calculate comprehensive summary
-    const summary = calculateComprehensiveSummary(results);
-    
-    res.json({
-      success: true,
-      data: {
-        testType: 'Comprehensive',
-        models: models,
-        results: results,
-        summary: summary
-      }
-    });
-    
-  } catch (error) {
-    console.error('Comprehensive test error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to run comprehensive test'
-    });
-  }
-};
-
-// A/A Testing: Test same model twice for consistency
-const runAATest = async (req, res) => {
+const runFollowUpTest = async (req, res) => {
   try {
     const { model = 'openai' } = req.body;
-    
-    console.log(`🔄 Running A/A test for ${model}`);
-    
+    const followUpScenarios = [
+      {
+        id: 'project_management',
+        subject: 'Project Management',
+        initialQuestion: 'List the main phases of a software development lifecycle.',
+        followUpQuestion: 'Can you explain the third phase in more detail?'
+      },
+      {
+        id: 'essay_writing',
+        subject: 'Essay Writing',
+        initialQuestion: 'What are the typical sections of a scientific research paper?',
+        followUpQuestion: 'What is the purpose of the section you mentioned just before the conclusion?'
+      },
+      {
+        id: 'mathematics',
+        subject: 'Mathematics',
+        initialQuestion: 'Describe the steps to solve a system of linear equations using substitution.',
+        followUpQuestion: 'How would you apply the last step you described to a real example?'
+      },
+      {
+        id: 'research',
+        subject: 'Research',
+        initialQuestion: 'Outline the process of conducting a literature review.',
+        followUpQuestion: 'Can you elaborate on the step that comes after identifying key sources?'
+      },
+      {
+        id: 'business',
+        subject: 'Business',
+        initialQuestion: 'What are the essential elements of a marketing plan?',
+        followUpQuestion: 'Could you provide more details about the element you listed second?'
+      },
+      {
+        id: 'history',
+        subject: 'History',
+        initialQuestion: 'Summarize the causes of World War I.',
+        followUpQuestion: 'Can you expand on the cause you mentioned last?'
+      },
+      {
+        id: 'biology',
+        subject: 'Biology',
+        initialQuestion: 'List the stages of mitosis.',
+        followUpQuestion: 'What happens during the stage that comes right after metaphase?'
+      },
+      {
+        id: 'programming',
+        subject: 'Programming',
+        initialQuestion: 'What are the main principles of object-oriented programming?',
+        followUpQuestion: 'Can you explain the principle you mentioned first with an example?'
+      },
+      {
+        id: 'economics',
+        subject: 'Economics',
+        initialQuestion: 'Describe the basic steps in conducting a cost-benefit analysis.',
+        followUpQuestion: 'Could you go into more detail about the step that involves estimating costs?'
+      },
+      {
+        id: 'geography',
+        subject: 'Geography',
+        initialQuestion: 'Name the major climate zones on Earth.',
+        followUpQuestion: 'What are the main characteristics of the zone you listed last?'
+      }
+    ];
     const results = [];
-    
-    for (const question of testQuestions) {
-      console.log(`Testing question ${question.id}: ${question.question.substring(0, 50)}...`);
-      
-      // Test Model twice
-      const response1 = await getModelResponse(question.question, model);
-      const response2 = await getModelResponse(question.question, model);
-      
-      const eval1 = simpleEvaluator.evaluateResponse(response1.content, question.expectedKeywords);
-      const eval2 = simpleEvaluator.evaluateResponse(response2.content, question.expectedKeywords);
-      const comparison = simpleEvaluator.compareResponses(response1.content, response2.content, question.expectedKeywords);
-      
+    for (const scenario of followUpScenarios) {
+      // Get initial response
+      const initialResponse = await getModelResponse(scenario.initialQuestion, model);
+      // Create conversation context with initial Q&A
+      const conversationContext = [
+        { role: 'user', content: scenario.initialQuestion },
+        { role: 'assistant', content: initialResponse.content },
+        { role: 'user', content: scenario.followUpQuestion }
+      ];
+      // Get follow-up response with context
+      const followUpResponse = await getModelResponseWithContext(conversationContext, model);
+      // Word count for each response
+      const initialWordCount = initialResponse.content.split(/\s+/).length;
+      const followUpWordCount = followUpResponse.content.split(/\s+/).length;
       results.push({
-        questionId: question.id,
-        question: question.question,
-        subject: question.subject,
-        difficulty: question.difficulty,
-        expectedKeywords: question.expectedKeywords,
-        run1: {
-          response: response1.content,
-          responseTime: response1.responseTime,
-          tokensUsed: response1.tokensUsed,
-          evaluation: eval1
-        },
-        run2: {
-          response: response2.content,
-          responseTime: response2.responseTime,
-          tokensUsed: response2.tokensUsed,
-          evaluation: eval2
-        },
-        consistency: comparison
+        scenarioId: scenario.id,
+        subject: scenario.subject,
+        initialQuestion: scenario.initialQuestion,
+        initialResponse: initialResponse.content,
+        initialWordCount,
+        initialResponseTime: initialResponse.responseTime,
+        followUpQuestion: scenario.followUpQuestion,
+        followUpResponse: followUpResponse.content,
+        followUpWordCount,
+        followUpResponseTime: followUpResponse.responseTime
       });
-      
-      // Small delay between requests
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    
-    // Calculate consistency summary
-    const summary = calculateAATestSummary(results, model);
-    
     res.json({
       success: true,
       data: {
-        testType: 'A/A',
+        testType: 'FollowUp',
         model: model,
-        results: results,
-        summary: summary
+        results: results
       }
     });
-    
   } catch (error) {
-    console.error('A/A test error:', error);
+    console.error('Follow-up test error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to run A/A test'
+      message: 'Failed to run follow-up test'
     });
   }
 };
 
-// Helper function to get model response
 async function getModelResponse(question, model) {
   const startTime = Date.now();
-  
   try {
     const messages = [{ role: 'user', content: question }];
-    
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);
-    } else if (model === 'mistral') {
-      response = await mistralService.generateChatResponse(messages);
     } else {
       response = await openaiService.generateChatResponse(messages);
     }
-    
     return {
       content: response.content,
       responseTime: Date.now() - startTime,
       tokensUsed: response.tokensUsed || 0
     };
-    
   } catch (error) {
     console.error(`Error getting response from ${model}:`, error);
     return {
@@ -209,79 +177,31 @@ async function getModelResponse(question, model) {
   }
 }
 
-// Calculate comprehensive test summary
-function calculateComprehensiveSummary(results) {
-  const models = ['openai', 'llama', 'mistral'];
-  const summary = {
-    totalQuestions: results.length,
-    modelStats: {},
-    rankings: {
-      relevance: [],
-      speed: [],
-      efficiency: []
+async function getModelResponseWithContext(messages, model) {
+  const startTime = Date.now();
+  try {
+    let response;
+    if (model === 'llama') {
+      response = await llamaService.generateChatResponse(messages);
+    } else {
+      response = await openaiService.generateChatResponse(messages);
     }
-  };
-  
-  // Calculate stats for each model
-  for (const model of models) {
-    const modelResults = results.map(r => r.models[model]);
-    const avgRelevance = modelResults.reduce((sum, r) => sum + r.evaluation.relevance, 0) / modelResults.length;
-    const avgResponseTime = modelResults.reduce((sum, r) => sum + r.responseTime, 0) / modelResults.length;
-    const avgTokens = modelResults.reduce((sum, r) => sum + r.tokensUsed, 0) / modelResults.length;
-    
-    summary.modelStats[model] = {
-      avgRelevance: avgRelevance,
-      avgResponseTime: Math.round(avgResponseTime),
-      avgTokens: Math.round(avgTokens),
-      totalWins: 0
+    return {
+      content: response.content,
+      responseTime: Date.now() - startTime,
+      tokensUsed: response.tokensUsed || 0
+    };
+  } catch (error) {
+    console.error(`Error getting response from ${model}:`, error);
+    return {
+      content: 'Error: Failed to generate response',
+      responseTime: Date.now() - startTime,
+      tokensUsed: 0
     };
   }
-  
-  // Calculate wins for each model
-  for (const result of results) {
-    const relevances = models.map(model => result.models[model].evaluation.relevance);
-    const maxRelevance = Math.max(...relevances);
-    const winningModels = models.filter(model => result.models[model].evaluation.relevance === maxRelevance);
-    
-    for (const winningModel of winningModels) {
-      summary.modelStats[winningModel].totalWins++;
-    }
-  }
-  
-  // Create rankings
-  summary.rankings.relevance = models.sort((a, b) => summary.modelStats[b].avgRelevance - summary.modelStats[a].avgRelevance);
-  summary.rankings.speed = models.sort((a, b) => summary.modelStats[a].avgResponseTime - summary.modelStats[b].avgResponseTime);
-  summary.rankings.efficiency = models.sort((a, b) => summary.modelStats[a].avgTokens - summary.modelStats[b].avgTokens);
-  
-  // Overall winner (based on most wins)
-  const wins = models.map(model => ({ model, wins: summary.modelStats[model].totalWins }));
-  wins.sort((a, b) => b.wins - a.wins);
-  summary.overallWinner = wins[0].model;
-  
-  return summary;
-}
-
-// Calculate A/A test summary
-function calculateAATestSummary(results, model) {
-  const consistentResponses = results.filter(r => r.consistency.isConsistent).length;
-  const inconsistentResponses = results.length - consistentResponses;
-  
-  const avgConsistency = results.reduce((sum, r) => sum + r.consistency.consistency, 0) / results.length;
-  const avgLengthDifference = results.reduce((sum, r) => sum + r.consistency.lengthDifference, 0) / results.length;
-  
-  return {
-    totalQuestions: results.length,
-    consistentResponses: consistentResponses,
-    inconsistentResponses: inconsistentResponses,
-    consistencyRate: (consistentResponses / results.length) * 100,
-    avgConsistency: avgConsistency,
-    avgLengthDifference: Math.round(avgLengthDifference),
-    isConsistent: (consistentResponses / results.length) > 0.7 // 70% threshold
-  };
 }
 
 module.exports = {
   sendMessage,
-  runComprehensiveTest,
-  runAATest
+  runFollowUpTest
 }; 

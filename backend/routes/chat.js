@@ -5,10 +5,7 @@ const { validateChatMessage } = require('../middleware/validation');
 
 router.post('/', validateChatMessage, chatController.sendMessage);
 
-// Comprehensive Testing route (all 3 models)
-router.post('/comprehensive-test', chatController.runComprehensiveTest);
-
-// A/A Testing route
-router.post('/aa-test', chatController.runAATest);
+// Follow-up Testing route
+router.post('/followup-test', chatController.runFollowUpTest);
 
 module.exports = router; 

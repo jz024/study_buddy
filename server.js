@@ -88,6 +88,9 @@ try {
   });
 }
 
+const chatDbRoutes = require('./backend/routes/chatdb');
+app.use('/api/chats', chatDbRoutes);
+
 
 if (routes) {
   app.use('/api', routes);
