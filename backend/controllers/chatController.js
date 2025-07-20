@@ -6,17 +6,31 @@ const sendMessage = async (req, res) => {
   try {
     const { message, subjectId, model = 'openai', history } = req.body;
     
-    let messages = [];
+    // Add system message for context awareness
+    let messages = [
+      { 
+        role: 'system', 
+        content: 'You are a helpful AI assistant. Always maintain context from previous messages in the conversation. When asked follow-up questions, refer to the previous context and provide relevant, contextual responses.'
+      }
+    ];
     
+    // Add conversation history
     if (history && Array.isArray(history) && history.length > 0) {
-      messages = [...history];
+      messages = [...messages, ...history];
     }
     
+    // Add current user message
     messages.push({ role: 'user', content: message });
     
-    if (messages.length > 20) {
-      messages = messages.slice(-20);
+    // Limit to last 20 messages (including system message)
+    if (messages.length > 21) {
+      const systemMessage = messages[0];
+      const conversationMessages = messages.slice(1, -1);
+      const currentMessage = messages[messages.length - 1];
+      messages = [systemMessage, ...conversationMessages.slice(-19), currentMessage];
     }
+    
+    console.log('🔍 Debug - Messages being sent to AI:', JSON.stringify(messages, null, 2));
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);

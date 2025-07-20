@@ -11,14 +11,20 @@ class OpenAIService {
         };
       }
 
-      const systemMessage = {
-        role: 'system',
-        content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses.`
-      };
+      const hasSystemMessage = messages.length > 0 && messages[0].role === 'system';
+      
+      let finalMessages = messages;
+      if (!hasSystemMessage) {
+        const systemMessage = {
+          role: 'system',
+          content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses. Always maintain context from previous messages.`
+        };
+        finalMessages = [systemMessage, ...messages];
+      }
 
       const response = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: [systemMessage, ...messages],
+        messages: finalMessages,
         max_tokens: 1000,
         temperature: 0.7,
       });
@@ -71,7 +77,6 @@ Format:
 
   async generateQuiz(content, questionCount = 5, difficulty = 'medium') {
     try {
-      // Check if OpenAI client is initialized
       if (!openai) {
         console.log('OpenAI client not initialized - returning placeholder quiz');
         return {
@@ -123,10 +128,9 @@ Format:
 
   async generateEmbedding(text) {
     try {
-      // Check if OpenAI client is initialized
       if (!openai) {
         console.log('OpenAI client not initialized - returning placeholder embedding');
-        return new Array(1536).fill(0); // Return zero vector
+        return new Array(1536).fill(0);
       }
 
       const response = await openai.embeddings.create({
@@ -143,7 +147,6 @@ Format:
 
   async summarizeText(text, maxLength = 200) {
     try {
-      // Check if OpenAI client is initialized
       if (!openai) {
         console.log('OpenAI client not initialized - returning placeholder summary');
         return `This is a placeholder summary of the text. Please set up your OpenAI API key to enable full AI functionality.`;

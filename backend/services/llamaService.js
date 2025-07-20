@@ -33,14 +33,20 @@ class LlamaService {
         };
       }
 
-      const systemMessage = {
-        role: 'system',
-        content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses.`
-      };
+      const hasSystemMessage = messages.length > 0 && messages[0].role === 'system';
+      
+      let finalMessages = messages;
+      if (!hasSystemMessage) {
+        const systemMessage = {
+          role: 'system',
+          content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses. Always maintain context from previous messages.`
+        };
+        finalMessages = [systemMessage, ...messages];
+      }
 
       const response = await this.client.chat.completions.create({
         model: "Meta-Llama-3.3-70B-Instruct",
-        messages: [systemMessage, ...messages],
+        messages: finalMessages,
         temperature: 0.7,
         top_p: 0.1,
         max_tokens: 1000
