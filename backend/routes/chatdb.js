@@ -63,7 +63,6 @@ router.post('/:chat_id/messages', async (req, res) => {
       role: m.sender === 'user' ? 'user' : 'assistant',
       content: m.content
     }));
-    // Get chat info for model selection
     const chatResult = await pool.query('SELECT * FROM chats WHERE id = $1', [chat_id]);
     const chat = chatResult.rows[0];
     let response;
@@ -72,7 +71,6 @@ router.post('/:chat_id/messages', async (req, res) => {
     } else {
       response = await openaiService.generateChatResponse(history);
     }
-    // Insert assistant response
     await pool.query(
       'INSERT INTO messages (chat_id, sender, content) VALUES ($1, $2, $3)',
       [chat_id, 'assistant', response.content]

@@ -206,11 +206,9 @@ const SubjectWorkspacePage = () => {
       });
 
       if (response.data.success) {
-        // Add the AI response to chat history
         setChatHistory(prev => [{ type: 'ai', content: response.data.aiResponse }, ...prev]);
       }
       
-      // Scroll to top after adding AI response
       setTimeout(() => {
         const chatHistory = document.getElementById('chat-history');
         if (chatHistory) {
@@ -224,7 +222,6 @@ const SubjectWorkspacePage = () => {
         content: 'Sorry, I encountered an error. Please try again later.' 
       }, ...prev]);
       
-      // Scroll to top after adding error message
       setTimeout(() => {
         const chatHistory = document.getElementById('chat-history');
         if (chatHistory) {

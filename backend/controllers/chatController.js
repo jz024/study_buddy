@@ -5,15 +5,18 @@ const llamaService = require('../services/llamaService');
 const sendMessage = async (req, res) => {
   try {
     const { message, subjectId, model = 'openai', history } = req.body;
-    if (!message && (!history || !Array.isArray(history) || history.length === 0)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Message or history is required'
-      });
+    
+    let messages = [];
+    
+    if (history && Array.isArray(history) && history.length > 0) {
+      messages = [...history];
     }
-    const messages = (history && Array.isArray(history) && history.length > 0)
-      ? history
-      : [{ role: 'user', content: message }];
+    
+    messages.push({ role: 'user', content: message });
+    
+    if (messages.length > 20) {
+      messages = messages.slice(-20);
+    }
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);
@@ -108,17 +111,13 @@ const runFollowUpTest = async (req, res) => {
     ];
     const results = [];
     for (const scenario of followUpScenarios) {
-      // Get initial response
       const initialResponse = await getModelResponse(scenario.initialQuestion, model);
-      // Create conversation context with initial Q&A
       const conversationContext = [
         { role: 'user', content: scenario.initialQuestion },
         { role: 'assistant', content: initialResponse.content },
         { role: 'user', content: scenario.followUpQuestion }
       ];
-      // Get follow-up response with context
       const followUpResponse = await getModelResponseWithContext(conversationContext, model);
-      // Word count for each response
       const initialWordCount = initialResponse.content.split(/\s+/).length;
       const followUpWordCount = followUpResponse.content.split(/\s+/).length;
       results.push({

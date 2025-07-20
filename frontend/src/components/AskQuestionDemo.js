@@ -203,7 +203,18 @@ const AskQuestionDemo = () => {
 
     try {
       const requestUrl = `${API_BASE_URL}/api/chat`;
-      const requestData = { message: userQuestion, subjectId: null, model: selectedModel };
+      
+      const history = chatHistory.map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+      
+      const requestData = { 
+        message: userQuestion, 
+        subjectId: null, 
+        model: selectedModel,
+        history: history
+      };
       
       const result = await axios.post(requestUrl, requestData);
 
@@ -311,7 +322,7 @@ const AskQuestionDemo = () => {
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4, gap: 2 }}>
             <FormControl sx={{ minWidth: 200 }}>
               <InputLabel>Language Model</InputLabel>
               <Select
@@ -336,6 +347,24 @@ const AskQuestionDemo = () => {
                 <MenuItem value="llama">Llama 3.3 70B</MenuItem>
               </Select>
             </FormControl>
+            
+            {chatHistory.length > 0 && (
+              <Button
+                variant="outlined"
+                onClick={() => setChatHistory([])}
+                sx={{
+                  borderRadius: '12px',
+                  borderColor: 'rgba(102, 126, 234, 0.3)',
+                  color: '#667eea',
+                  '&:hover': {
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                  }
+                }}
+              >
+                Clear Chat
+              </Button>
+            )}
           </Box>
 
           <form onSubmit={handleSubmit}>
@@ -489,6 +518,9 @@ const AskQuestionDemo = () => {
 
           {chatHistory.length > 0 && (
             <Box sx={{ maxHeight: 500, overflowY: 'auto', mb: 2 }} id="demo-chat-history">
+              <Typography variant="caption" sx={{ color: 'text.secondary', mb: 2, display: 'block' }}>
+                💬 Chat History ({chatHistory.length} messages) - Context maintained for follow-up questions
+              </Typography>
               {chatHistory.map((msg, idx) => (
                 <Paper 
                   key={idx}
