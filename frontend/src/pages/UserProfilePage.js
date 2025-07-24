@@ -40,6 +40,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { getAuth, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 
 const UserProfilePage = () => {
   const theme = useTheme();
@@ -48,6 +49,13 @@ const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -55,6 +63,41 @@ const UserProfilePage = () => {
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError('All fields are required.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      setPasswordSuccess('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowChangePassword(false);
+    } catch (err) {
+      setPasswordError(err.message || 'Failed to update password.');
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -347,6 +390,78 @@ const UserProfilePage = () => {
                       />
                     </ListItem>
                   </List>
+                </Paper>
+              </motion.div>
+            </Grid>
+
+            {/* Change Password Section */}
+            <Grid item xs={12} md={6}>
+              <motion.div variants={itemVariants}>
+                <Paper sx={{ p: 4, borderRadius: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Security />
+                    Change Password
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => setShowChangePassword((v) => !v)}
+                    sx={{ borderRadius: 2 }}
+                  >
+                    {showChangePassword ? 'Cancel Change Password' : 'Change Password'}
+                  </Button>
+                  {showChangePassword && (
+                    <Paper sx={{ p: 3, mt: 2, borderRadius: 2, maxWidth: 400 }}>
+                      <form onSubmit={handleChangePassword}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                          Change Password
+                        </Typography>
+                        <TextField
+                          label="Current Password"
+                          type="password"
+                          fullWidth
+                          margin="normal"
+                          value={currentPassword}
+                          onChange={e => setCurrentPassword(e.target.value)}
+                          required
+                        />
+                        <TextField
+                          label="New Password"
+                          type="password"
+                          fullWidth
+                          margin="normal"
+                          value={newPassword}
+                          onChange={e => setNewPassword(e.target.value)}
+                          required
+                        />
+                        <TextField
+                          label="Confirm New Password"
+                          type="password"
+                          fullWidth
+                          margin="normal"
+                          value={confirmPassword}
+                          onChange={e => setConfirmPassword(e.target.value)}
+                          required
+                        />
+                        {passwordError && (
+                          <Typography color="error" sx={{ mt: 1 }}>{passwordError}</Typography>
+                        )}
+                        {passwordSuccess && (
+                          <Typography color="success.main" sx={{ mt: 1 }}>{passwordSuccess}</Typography>
+                        )}
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          fullWidth
+                          sx={{ mt: 2, borderRadius: 2 }}
+                          disabled={passwordLoading}
+                        >
+                          {passwordLoading ? 'Updating...' : 'Update Password'}
+                        </Button>
+                      </form>
+                    </Paper>
+                  )}
                 </Paper>
               </motion.div>
             </Grid>

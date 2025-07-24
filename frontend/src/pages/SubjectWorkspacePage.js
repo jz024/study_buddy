@@ -40,12 +40,14 @@ import { motion } from 'framer-motion';
 import { getSubjectConfig, isSubjectAISupported } from '../data/subjectConfigs';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import englishService from '../services/subjects/englishService';
+import mathematicsService from '../services/subjects/mathematicsService';
 
 const SubjectWorkspacePage = () => {
   const theme = useTheme();
   const { subjectId } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, surveyData } = useAuth();
   const [selectedFunction, setSelectedFunction] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [question, setQuestion] = useState('');
@@ -224,14 +226,20 @@ const SubjectWorkspacePage = () => {
     }, 100);
     
     try {
-      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
-        sender: 'user',
-        content: userQuestion
-      });
-
-      if (response.data.success) {
-        setChatHistory(prev => [{ type: 'ai', content: response.data.aiResponse }, ...prev]);
+      let aiResponse;
+      if (subjectId === 'english') {
+        aiResponse = await englishService.askQuestion(userQuestion, '', surveyData);
+      } else if (subjectId === 'mathematics') {
+        aiResponse = await mathematicsService.askQuestion(userQuestion, '', surveyData);
+      } else {
+        // fallback to legacy API for unsupported subjects
+        const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+          sender: 'user',
+          content: userQuestion
+        });
+        aiResponse = response.data.success ? response.data.aiResponse : 'Sorry, I encountered an error.';
       }
+      setChatHistory(prev => [{ type: 'ai', content: aiResponse }, ...prev]);
       
       setTimeout(() => {
         const chatHistory = document.getElementById('chat-history');
@@ -262,13 +270,21 @@ const SubjectWorkspacePage = () => {
     
     try {
       setIsLoading(true);
-      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
-        sender: 'user',
-        content: 'Generate a quiz on general topics with medium difficulty and 10 questions.'
-      });
-      console.log('Generated quiz:', response.data);
+      let quizResponse;
+      if (subjectId === 'english') {
+        quizResponse = await englishService.generateQuiz('general topics', 'medium', 10, surveyData);
+      } else if (subjectId === 'mathematics') {
+        quizResponse = await mathematicsService.generateQuiz('general topics', 'medium', 10, surveyData);
+      } else {
+        const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+          sender: 'user',
+          content: 'Generate a quiz on general topics with medium difficulty and 10 questions.'
+        });
+        quizResponse = response.data.success ? response.data.aiResponse : 'Quiz generation failed.';
+      }
       // TODO: Navigate to quiz page or show quiz
       alert('Quiz generated! (Check console for details)');
+      console.log('Generated quiz:', quizResponse);
     } catch (error) {
       console.error('Failed to generate quiz:', error);
       setError('Failed to generate quiz. Please try again.');
@@ -283,13 +299,21 @@ const SubjectWorkspacePage = () => {
     try {
       setIsLoading(true);
       const sampleContent = `Sample ${currentSubject.name} content for flashcard generation.`;
-      const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
-        sender: 'user',
-        content: `Generate 10 flashcards from this content: "${sampleContent}". Each flashcard should be a question-answer pair.`
-      });
-      console.log('Generated flashcards:', response.data);
+      let flashcardsResponse;
+      if (subjectId === 'english') {
+        flashcardsResponse = await englishService.generateFlashcards(sampleContent, 10, surveyData);
+      } else if (subjectId === 'mathematics') {
+        flashcardsResponse = await mathematicsService.generateFlashcards(sampleContent, 10, surveyData);
+      } else {
+        const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
+          sender: 'user',
+          content: `Generate 10 flashcards from this content: "${sampleContent}". Each flashcard should be a question-answer pair.`
+        });
+        flashcardsResponse = response.data.success ? response.data.aiResponse : 'Flashcard generation failed.';
+      }
       // TODO: Navigate to flashcard page or show flashcards
       alert('Flashcards generated! (Check console for details)');
+      console.log('Generated flashcards:', flashcardsResponse);
     } catch (error) {
       console.error('Failed to generate flashcards:', error);
       setError('Failed to generate flashcards. Please try again.');

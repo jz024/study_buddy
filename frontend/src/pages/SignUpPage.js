@@ -31,7 +31,7 @@ import { motion } from 'framer-motion';
 const SignUpPage = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { signup, error, clearError } = useAuth();
+  const { signup, error, clearError, fetchSurveyData } = useAuth();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -97,8 +97,16 @@ const SignUpPage = () => {
 
     setLoading(true);
     try {
-      await signup(formData.email, formData.password, formData.name);
-      navigate('/dashboard'); // Redirect to dashboard after successful signup
+      const user = await signup(formData.email, formData.password, formData.name);
+      // Fetch survey data for the new user
+      await fetchSurveyData(user.uid);
+      // Check if survey data exists
+      const userDoc = await fetchSurveyData(user.uid);
+      if (!userDoc) {
+        navigate('/onboarding-survey');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('Signup failed:', error);
     } finally {
