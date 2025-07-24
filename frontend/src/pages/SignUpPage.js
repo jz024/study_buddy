@@ -98,15 +98,8 @@ const SignUpPage = () => {
     setLoading(true);
     try {
       const user = await signup(formData.email, formData.password, formData.name);
-      // Fetch survey data for the new user
-      await fetchSurveyData(user.uid);
-      // Check if survey data exists
-      const userDoc = await fetchSurveyData(user.uid);
-      if (!userDoc) {
-        navigate('/onboarding-survey');
-      } else {
-        navigate('/dashboard');
-      }
+      // After signup, go directly to onboarding survey (user doc not created yet)
+      navigate('/onboarding-survey');
     } catch (error) {
       console.error('Signup failed:', error);
     } finally {
