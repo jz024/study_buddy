@@ -9,20 +9,21 @@ const englishService = {
   getPersonalizedPrompt(surveyData) {
     let personalization = '';
     if (surveyData) {
-      personalization = `\n\n[User Profile]\n- Education Level: ${surveyData.educationLevel}\n- Age: ${surveyData.age}\n- Learning Goals: ${surveyData.learningGoals}\n`;
+      personalization = `\n\n[User Profile]\n- Education Level: ${surveyData.educationLevel}\n- Age: ${surveyData.age}\n- Learning Goals: ${surveyData.learningGoals}\n\n[Instructions for AI]\n- Tailor your explanations, vocabulary, and examples to suit a ${surveyData.educationLevel} student, age ${surveyData.age}.\n- Use simple language and concrete examples for younger or less advanced users.\n- For advanced users, provide deeper insights, technical terms, and more complex examples.\n- Always check the user's profile before answering.\n`;
     }
     return personalization + this.systemPrompt;
   },
 
   systemPrompt: `You are an expert English tutor specializing in literature, grammar, and writing. \nYou have deep knowledge of English literature from classical to modern works, grammar rules, \nwriting techniques, and literary analysis. Provide clear, educational responses that help students \nunderstand complex concepts in English studies. Always include examples and explanations that \nenhance learning.\n\nIMPORTANT: Format your responses using proper markdown:\n- Use **bold** for emphasis and key concepts\n- Use bullet points with * for lists\n- Use numbered lists (1., 2., 3.) for steps\n- Use clear headings with ## for sections\n- Separate paragraphs with line breaks`,
 
-  async askQuestion(question, context = '', surveyData = null) {
+  async askQuestion(question, context = '', surveyData = null, model = 'openai') {
     try {
       const personalizedPrompt = this.getPersonalizedPrompt(surveyData);
       const response = await axios.post('/api/chat', {
         message: question,
         subjectId: this.subjectId,
-        context: context || personalizedPrompt
+        context: context || personalizedPrompt,
+        model
       });
 
       if (response.data.success) {
@@ -36,7 +37,7 @@ const englishService = {
     }
   },
 
-  async generateQuiz(topic, difficulty = 'medium', questionCount = 10, surveyData = null) {
+  async generateQuiz(topic, difficulty = 'medium', questionCount = 10, surveyData = null, model = 'openai') {
     try {
       const personalizedPrompt = this.getPersonalizedPrompt(surveyData);
       const prompt = `Generate a ${difficulty} level quiz about ${topic} in English studies. \nCreate ${questionCount} multiple choice questions with 4 options each. \nInclude the correct answer and a brief explanation for each question.\n\nContext: ${personalizedPrompt}\n\nFormat the response as JSON with the following structure:\n{\n  "title": "Quiz Title",\n  "questions": [\n    {\n      "question": "Question text",\n      "options": ["A", "B", "C", "D"],\n      "correctAnswer": "A",\n      "explanation": "Brief explanation"\n    }\n  ]\n}`;
@@ -44,7 +45,8 @@ const englishService = {
       const response = await axios.post('/api/chat', {
         message: prompt,
         subjectId: this.subjectId,
-        context: personalizedPrompt
+        context: personalizedPrompt,
+        model
       });
 
       if (response.data.success) {
@@ -67,7 +69,7 @@ const englishService = {
     }
   },
 
-  async generateFlashcards(content, cardCount = 10, surveyData = null) {
+  async generateFlashcards(content, cardCount = 10, surveyData = null, model = 'openai') {
     try {
       const personalizedPrompt = this.getPersonalizedPrompt(surveyData);
       const prompt = `Create ${cardCount} flashcards from the following content about English studies.\n\nContent: ${content}\n\nContext: ${personalizedPrompt}\n\nFormat the response as JSON with the following structure:\n{\n  "flashcards": [\n    {\n      "front": "Question or concept",\n      "back": "Answer or explanation"\n    }\n  ]\n}`;
@@ -75,7 +77,8 @@ const englishService = {
       const response = await axios.post('/api/chat', {
         message: prompt,
         subjectId: this.subjectId,
-        context: personalizedPrompt
+        context: personalizedPrompt,
+        model
       });
 
       if (response.data.success) {
@@ -97,7 +100,7 @@ const englishService = {
     }
   },
 
-  async analyzeNotes(notes, surveyData = null) {
+  async analyzeNotes(notes, surveyData = null, model = 'openai') {
     try {
       const personalizedPrompt = this.getPersonalizedPrompt(surveyData);
       const prompt = `Analyze the following English study notes and provide insights, key concepts, and suggestions for improvement.\n\nNotes: ${notes}\n\nContext: ${personalizedPrompt}\n\nProvide a comprehensive analysis including:\n1. Key concepts identified\n2. Areas for improvement\n3. Related topics to explore\n4. Study recommendations`;
@@ -105,7 +108,8 @@ const englishService = {
       const response = await axios.post('/api/chat', {
         message: prompt,
         subjectId: this.subjectId,
-        context: personalizedPrompt
+        context: personalizedPrompt,
+        model
       });
 
       if (response.data.success) {

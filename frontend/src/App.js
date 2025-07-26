@@ -1,16 +1,15 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-
-// Pages
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { AuthProvider } from './contexts/AuthContext';
 import LandingPage from './pages/LandingPage';
-import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
-import UserProfilePage from './pages/UserProfilePage';
 import SubjectWorkspacePage from './pages/SubjectWorkspacePage';
-
-// Components
-import ModelTesting from './components/ModelTesting';
+import OnboardingSurveyPage from './pages/OnboardingSurveyPage';
+import UserProfilePage from './pages/UserProfilePage';
 
 function App() {
   return (
@@ -24,9 +23,7 @@ function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/profile" element={<UserProfilePage />} />
       <Route path="/subject/:subjectId" element={<SubjectWorkspacePage />} />
-      
-      {/* Testing Route */}
-      <Route path="/testing" element={<ModelTesting />} />
+      <Route path="/onboarding-survey" element={<OnboardingSurveyPage />} />
       
       {/* Catch all route - redirect to home */}
       <Route path="*" element={<LandingPage />} />

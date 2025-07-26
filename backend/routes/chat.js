@@ -5,7 +5,7 @@ const { validateChatMessage } = require('../middleware/validation');
 
 router.post('/', validateChatMessage, chatController.sendMessage);
 
-// Follow-up Testing route
-router.post('/followup-test', chatController.runFollowUpTest);
+// Quiz generation from chat history
+router.post('/quiz-from-history', chatController.generateQuizFromHistory);
 
 module.exports = router; 

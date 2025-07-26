@@ -37,9 +37,14 @@ class LlamaService {
       
       let finalMessages = messages;
       if (!hasSystemMessage) {
+        let systemContent = `You are an AI study buddy helping students learn.`;
+        if (context) {
+          systemContent += `\n\n${context}\n\n[Instructions for AI]\n- Tailor your explanations, vocabulary, and examples to suit the user's education level and age as described above.\n- Use simple language and concrete examples for younger or less advanced users.\n- For advanced users, provide deeper insights, technical terms, and more complex examples.\n- Always check the user's profile before answering.`;
+        }
+        systemContent += ' Be helpful, encouraging, and educational in your responses. Always maintain context from previous messages.';
         const systemMessage = {
           role: 'system',
-          content: `You are an AI study buddy helping students learn. ${context ? `Context: ${context}` : ''} Be helpful, encouraging, and educational in your responses. Always maintain context from previous messages.`
+          content: systemContent
         };
         finalMessages = [systemMessage, ...messages];
       }
@@ -59,6 +64,53 @@ class LlamaService {
     } catch (error) {
       console.error('Llama chat error:', error);
       throw new Error('Failed to generate Llama response');
+    }
+  }
+
+  async generateQuiz(content, questionCount = 5, difficulty = 'medium') {
+    try {
+      if (!this.client) {
+        return {
+          title: "Sample Quiz",
+          questions: [
+            {
+              question: "This is a sample question?",
+              type: "multiple-choice",
+              options: ["A", "B", "C", "D"],
+              correctAnswer: "A",
+              explanation: "This is a sample explanation"
+            }
+          ]
+        };
+      }
+
+      const prompt = content;
+
+      const response = await this.client.chat.completions.create({
+        model: "Meta-Llama-3.3-70B-Instruct",
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        top_p: 0.1,
+        max_tokens: 2000
+      });
+
+      let quizText = response.choices[0].message.content.trim();
+      if (quizText.startsWith('```')) {
+        quizText = quizText.replace(/^```[a-zA-Z]*\n?/, '');
+        if (quizText.endsWith('```')) {
+          quizText = quizText.slice(0, -3);
+        }
+        quizText = quizText.trim();
+      }
+      try {
+        return JSON.parse(quizText);
+      } catch (parseError) {
+        console.error('Llama quiz generation returned invalid JSON. Raw response:', quizText);
+        throw new Error('Llama quiz generation failed: invalid JSON returned by model.');
+      }
+    } catch (error) {
+      console.error('Llama quiz generation error:', error);
+      throw new Error('Failed to generate quiz');
     }
   }
 }

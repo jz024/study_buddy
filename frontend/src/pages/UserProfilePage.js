@@ -234,15 +234,14 @@ const UserProfilePage = () => {
           </motion.div>
 
           <Grid container spacing={4}>
-            {/* Profile Information */}
+            {/* Profile Information and Change Password stacked */}
             <Grid item xs={12} md={6}>
               <motion.div variants={itemVariants}>
-                <Paper sx={{ p: 4, borderRadius: 3 }}>
+                <Paper sx={{ p: 4, borderRadius: 3, mb: 4 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Person />
                     Profile Information
                   </Typography>
-                  
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -256,7 +255,6 @@ const UserProfilePage = () => {
                         size="small"
                       />
                     </Box>
-                    
                     <Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         Email Address
@@ -272,7 +270,6 @@ const UserProfilePage = () => {
                         }}
                       />
                     </Box>
-                    
                     <Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         Member Since
@@ -292,7 +289,6 @@ const UserProfilePage = () => {
                       />
                     </Box>
                   </Box>
-                  
                   {isEditing && (
                     <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
                       <Button
@@ -313,90 +309,7 @@ const UserProfilePage = () => {
                     </Box>
                   )}
                 </Paper>
-              </motion.div>
-            </Grid>
-
-            {/* Settings */}
-            <Grid item xs={12} md={6}>
-              <motion.div variants={itemVariants}>
-                <Paper sx={{ p: 4, borderRadius: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Settings />
-                    Settings
-                  </Typography>
-                  
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <Notifications />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Push Notifications"
-                        secondary="Receive study reminders and updates"
-                      />
-                      <Switch
-                        checked={notifications}
-                        onChange={(e) => setNotifications(e.target.checked)}
-                      />
-                    </ListItem>
-                    
-                    <Divider />
-                    
-                    <ListItem>
-                      <ListItemIcon>
-                        <Email />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Email Updates"
-                        secondary="Get weekly progress reports"
-                      />
-                      <Switch
-                        checked={emailUpdates}
-                        onChange={(e) => setEmailUpdates(e.target.checked)}
-                      />
-                    </ListItem>
-                  </List>
-                  
-                  <Divider sx={{ my: 2 }} />
-                  
-                  <List>
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Security />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Privacy & Security"
-                        secondary="Manage your account security"
-                      />
-                    </ListItem>
-                    
-                    <ListItem button>
-                      <ListItemIcon>
-                        <Help />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Help & Support"
-                        secondary="Get help and contact support"
-                      />
-                    </ListItem>
-                    
-                    <ListItem button onClick={handleLogout}>
-                      <ListItemIcon>
-                        <Logout />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Logout"
-                        secondary="Sign out of your account"
-                      />
-                    </ListItem>
-                  </List>
-                </Paper>
-              </motion.div>
-            </Grid>
-
-            {/* Change Password Section */}
-            <Grid item xs={12} md={6}>
-              <motion.div variants={itemVariants}>
+                {/* Change Password Section directly below Profile Info */}
                 <Paper sx={{ p: 4, borderRadius: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Security />
@@ -462,6 +375,76 @@ const UserProfilePage = () => {
                       </form>
                     </Paper>
                   )}
+                </Paper>
+              </motion.div>
+            </Grid>
+            {/* Settings */}
+            <Grid item xs={12} md={6}>
+              <motion.div variants={itemVariants}>
+                <Paper sx={{ p: 4, borderRadius: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Settings />
+                    Settings
+                  </Typography>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <Notifications />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Push Notifications"
+                        secondary="Receive study reminders and updates"
+                      />
+                      <Switch
+                        checked={notifications}
+                        onChange={(e) => setNotifications(e.target.checked)}
+                      />
+                    </ListItem>
+                    <Divider />
+                    <ListItem>
+                      <ListItemIcon>
+                        <Email />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Email Updates"
+                        secondary="Get weekly progress reports"
+                      />
+                      <Switch
+                        checked={emailUpdates}
+                        onChange={(e) => setEmailUpdates(e.target.checked)}
+                      />
+                    </ListItem>
+                  </List>
+                  <Divider sx={{ my: 2 }} />
+                  <List>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <Security />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Privacy & Security"
+                        secondary="Manage your account security"
+                      />
+                    </ListItem>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <Help />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Help & Support"
+                        secondary="Get help and contact support"
+                      />
+                    </ListItem>
+                    <ListItem button onClick={handleLogout}>
+                      <ListItemIcon>
+                        <Logout />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary="Logout"
+                        secondary="Sign out of your account"
+                      />
+                    </ListItem>
+                  </List>
                 </Paper>
               </motion.div>
             </Grid>

@@ -16,7 +16,8 @@ router.post('/', async (req, res) => {
     );
     res.json({ success: true, chat: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('Error in /api/chats POST:', err);
+    res.status(500).json({ success: false, message: err.message, stack: err.stack });
   }
 });
 

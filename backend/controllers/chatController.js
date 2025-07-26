@@ -1,28 +1,25 @@
 const openaiService = require('../services/openaiService');
 const llamaService = require('../services/llamaService');
+const pool = require('../db'); 
 
 
 const sendMessage = async (req, res) => {
   try {
     const { message, subjectId, model = 'openai', history } = req.body;
     
-    // Add system message for context awareness
     let messages = [
       { 
         role: 'system', 
         content: 'You are a helpful AI assistant. Always maintain context from previous messages in the conversation. When asked follow-up questions, refer to the previous context and provide relevant, contextual responses.'
       }
     ];
-    
-    // Add conversation history
+
     if (history && Array.isArray(history) && history.length > 0) {
       messages = [...messages, ...history];
     }
     
-    // Add current user message
     messages.push({ role: 'user', content: message });
     
-    // Limit to last 20 messages (including system message)
     if (messages.length > 21) {
       const systemMessage = messages[0];
       const conversationMessages = messages.slice(1, -1);
@@ -30,7 +27,6 @@ const sendMessage = async (req, res) => {
       messages = [systemMessage, ...conversationMessages.slice(-19), currentMessage];
     }
     
-    console.log('🔍 Debug - Messages being sent to AI:', JSON.stringify(messages, null, 2));
     let response;
     if (model === 'llama') {
       response = await llamaService.generateChatResponse(messages);
@@ -58,163 +54,183 @@ const sendMessage = async (req, res) => {
   }
 };
 
-const runFollowUpTest = async (req, res) => {
+const generateQuizFromHistory = async (req, res) => {
   try {
-    const { model = 'openai' } = req.body;
-    const followUpScenarios = [
-      {
-        id: 'project_management',
-        subject: 'Project Management',
-        initialQuestion: 'List the main phases of a software development lifecycle.',
-        followUpQuestion: 'Can you explain the third phase in more detail?'
-      },
-      {
-        id: 'essay_writing',
-        subject: 'Essay Writing',
-        initialQuestion: 'What are the typical sections of a scientific research paper?',
-        followUpQuestion: 'What is the purpose of the section you mentioned just before the conclusion?'
-      },
-      {
-        id: 'mathematics',
-        subject: 'Mathematics',
-        initialQuestion: 'Describe the steps to solve a system of linear equations using substitution.',
-        followUpQuestion: 'How would you apply the last step you described to a real example?'
-      },
-      {
-        id: 'research',
-        subject: 'Research',
-        initialQuestion: 'Outline the process of conducting a literature review.',
-        followUpQuestion: 'Can you elaborate on the step that comes after identifying key sources?'
-      },
-      {
-        id: 'business',
-        subject: 'Business',
-        initialQuestion: 'What are the essential elements of a marketing plan?',
-        followUpQuestion: 'Could you provide more details about the element you listed second?'
-      },
-      {
-        id: 'history',
-        subject: 'History',
-        initialQuestion: 'Summarize the causes of World War I.',
-        followUpQuestion: 'Can you expand on the cause you mentioned last?'
-      },
-      {
-        id: 'biology',
-        subject: 'Biology',
-        initialQuestion: 'List the stages of mitosis.',
-        followUpQuestion: 'What happens during the stage that comes right after metaphase?'
-      },
-      {
-        id: 'programming',
-        subject: 'Programming',
-        initialQuestion: 'What are the main principles of object-oriented programming?',
-        followUpQuestion: 'Can you explain the principle you mentioned first with an example?'
-      },
-      {
-        id: 'economics',
-        subject: 'Economics',
-        initialQuestion: 'Describe the basic steps in conducting a cost-benefit analysis.',
-        followUpQuestion: 'Could you go into more detail about the step that involves estimating costs?'
-      },
-      {
-        id: 'geography',
-        subject: 'Geography',
-        initialQuestion: 'Name the major climate zones on Earth.',
-        followUpQuestion: 'What are the main characteristics of the zone you listed last?'
+    const { user_id, subject, model = 'openai', questionCount = 10, difficulty = 'medium', userProfile = {} } = req.body;
+    
+    let adaptiveDifficulty = difficulty;
+    if (userProfile.educationLevel && userProfile.age) {
+      if (userProfile.educationLevel === 'Elementary' || userProfile.age < 12) {
+        adaptiveDifficulty = 'easy';
+      } else if (userProfile.educationLevel === 'PhD' || userProfile.age > 25) {
+        adaptiveDifficulty = 'hard';
+      } else {
+        adaptiveDifficulty = 'medium';
       }
-    ];
-    const results = [];
-    for (const scenario of followUpScenarios) {
-      const initialResponse = await getModelResponse(scenario.initialQuestion, model);
-      const conversationContext = [
-        { role: 'user', content: scenario.initialQuestion },
-        { role: 'assistant', content: initialResponse.content },
-        { role: 'user', content: scenario.followUpQuestion }
-      ];
-      const followUpResponse = await getModelResponseWithContext(conversationContext, model);
-      const initialWordCount = initialResponse.content.split(/\s+/).length;
-      const followUpWordCount = followUpResponse.content.split(/\s+/).length;
-      results.push({
-        scenarioId: scenario.id,
-        subject: scenario.subject,
-        initialQuestion: scenario.initialQuestion,
-        initialResponse: initialResponse.content,
-        initialWordCount,
-        initialResponseTime: initialResponse.responseTime,
-        followUpQuestion: scenario.followUpQuestion,
-        followUpResponse: followUpResponse.content,
-        followUpWordCount,
-        followUpResponseTime: followUpResponse.responseTime
-      });
-      await new Promise(resolve => setTimeout(resolve, 1000));
     }
+    
+    const chatResult = await pool.query(
+      'SELECT * FROM chats WHERE user_id = $1 AND subject = $2 ORDER BY created_at DESC LIMIT 1',
+      [user_id, subject]
+    );
+    
+    let quizData;
+    
+    const generateSubjectQuiz = async () => {
+      const subjectContent = `You are an expert ${subject} tutor. Generate a comprehensive ${adaptiveDifficulty} difficulty quiz with ${questionCount} questions about ${subject} topics.
+
+        SUBJECT: ${subject.toUpperCase()}
+        IMPORTANT: All questions must be about ${subject} topics only. Do NOT include questions about other subjects.
+
+        Student Profile:
+        - Age: ${userProfile.age || 18}
+        - Education Level: ${userProfile.educationLevel || 'High School'}
+        - Learning Goals: ${userProfile.learningGoals || 'General learning'}
+
+        Instructions:
+        - Generate questions ONLY about ${subject} topics and concepts
+        - Focus on ${subject}-specific terminology, skills, and fundamental concepts
+        - Create questions appropriate for ${adaptiveDifficulty} difficulty level for a ${userProfile.educationLevel || 'High School'} student
+        - Use vocabulary and concepts appropriate for age ${userProfile.age || 18}
+        - IMPORTANT: Only generate multiple choice questions (with 4 options) and true/false questions
+        - Do NOT generate short answer questions
+        - For multiple choice questions, provide 4 distinct options without prefixes like "Option A", "Option B", etc.
+        - Provide clear explanations for correct answers
+        - Ensure questions test understanding of ${subject} fundamentals and key concepts appropriate for the student's education level
+        - Generate questions that match the complexity and depth expected for ${userProfile.educationLevel || 'High School'} students
+
+        Format the response as JSON:
+        {
+          "title": "${subject.charAt(0).toUpperCase() + subject.slice(1)} Quiz",
+          "description": "Test your knowledge of ${subject} fundamentals and key concepts.",
+          "questions": [
+            {
+              "question": "Question text",
+              "type": "multiple-choice",
+              "options": ["Option A", "Option B", "Option C", "Option D"],
+              "correctAnswer": "Option A",
+              "explanation": "Explanation of why this answer is correct"
+            },
+            {
+              "question": "True or False: Statement here",
+              "type": "true-false",
+              "correctAnswer": "True",
+              "explanation": "Explanation of why this answer is correct"
+            }
+          ]
+        }`;
+      
+      if (model === 'llama') {
+        quizData = await llamaService.generateQuiz(subjectContent, questionCount, adaptiveDifficulty);
+      } else {
+        quizData = await openaiService.generateQuiz(subjectContent, questionCount, adaptiveDifficulty);
+      }
+      
+      quizData.title = `${subject.charAt(0).toUpperCase() + subject.slice(1)} Quiz`;
+      quizData.description = `Test your knowledge of ${subject} fundamentals and key concepts.`;
+    };
+    
+    if (!chatResult.rows.length) {
+      console.log(`No chat history found. Generating subject-based quiz.`);
+      await generateSubjectQuiz();
+      
+    } else {
+      const chat = chatResult.rows[0];
+      const messagesResult = await pool.query(
+        'SELECT sender, content FROM messages WHERE chat_id = $1 ORDER BY created_at DESC LIMIT 50',
+        [chat.id]
+      );
+      
+      if (!messagesResult.rows.length) {
+        console.log(`No messages found in chat. Generating subject-based quiz.`);
+        await generateSubjectQuiz();
+        
+      } else {
+        const chatHistory = messagesResult.rows.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        })).reverse();
+
+        const conversationSummary = chatHistory
+          .map(msg => `${msg.role === 'user' ? 'Student' : 'AI'}: ${msg.content}`)
+          .join('\n\n');
+        
+        const quizPrompt = `You are an expert ${subject} tutor. Generate a ${adaptiveDifficulty} difficulty quiz with ${questionCount} questions based on the conversation history below.
+
+          SUBJECT: ${subject.toUpperCase()}
+          IMPORTANT: All questions must be about ${subject} topics only. Do NOT include questions about other subjects like science, math, history, etc.
+
+          Student Profile:
+          - Age: ${userProfile.age || 18}
+          - Education Level: ${userProfile.educationLevel || 'High School'}
+          - Learning Goals: ${userProfile.learningGoals || 'General learning'}
+
+          Conversation History:
+          ${conversationSummary}
+
+          Instructions:
+          - Generate questions ONLY about ${subject} topics discussed in the conversation
+          - Focus on ${subject}-specific concepts, terminology, and skills
+          - If the conversation doesn't contain enough ${subject} content, generate questions about fundamental ${subject} concepts appropriate for the student's level
+          - Create questions that test understanding of the specific ${subject} topics discussed
+          - IMPORTANT: Only generate multiple choice questions (with 4 options) and true/false questions
+          - Do NOT generate short answer questions
+          - Make questions appropriate for ${adaptiveDifficulty} difficulty level for a ${userProfile.educationLevel || 'High School'} student
+          - Use vocabulary and concepts appropriate for age ${userProfile.age || 18}
+          - Provide clear explanations for correct answers
+          - Ensure questions directly relate to ${subject} content from the conversation
+          - Generate questions that match the complexity and depth expected for ${userProfile.educationLevel || 'High School'} students
+
+          Format the response as JSON:
+          {
+            "title": "${subject.charAt(0).toUpperCase() + subject.slice(1)} Quiz based on your recent study session",
+            "description": "Test your knowledge of the ${subject} topics you've been studying",
+            "questions": [
+              {
+                "question": "Question text",
+                "type": "multiple-choice",
+                "options": ["Option A", "Option B", "Option C", "Option D"],
+                "correctAnswer": "Option A",
+                "explanation": "Explanation of why this answer is correct"
+              },
+              {
+                "question": "True or False: Statement here",
+                "type": "true-false",
+                "correctAnswer": "True",
+                "explanation": "Explanation of why this answer is correct"
+              }
+            ]
+          }`;
+
+        if (model === 'llama') {
+          quizData = await llamaService.generateQuiz(quizPrompt, questionCount, adaptiveDifficulty);
+        } else {
+          quizData = await openaiService.generateQuiz(quizPrompt, questionCount, adaptiveDifficulty);
+        }
+      }
+    }
+    
     res.json({
       success: true,
       data: {
-        testType: 'FollowUp',
+        quiz: quizData,
+        source: quizData.title.includes('recent study session') ? 'chat_history' : 'subject_based',
+        subject: subject,
         model: model,
-        results: results
+        questionsGenerated: quizData.questions?.length || 0
       }
     });
+    
   } catch (error) {
-    console.error('Follow-up test error:', error);
+    console.error('Quiz generation error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to run follow-up test'
+      message: 'Failed to generate quiz'
     });
   }
 };
 
-async function getModelResponse(question, model) {
-  const startTime = Date.now();
-  try {
-    const messages = [{ role: 'user', content: question }];
-    let response;
-    if (model === 'llama') {
-      response = await llamaService.generateChatResponse(messages);
-    } else {
-      response = await openaiService.generateChatResponse(messages);
-    }
-    return {
-      content: response.content,
-      responseTime: Date.now() - startTime,
-      tokensUsed: response.tokensUsed || 0
-    };
-  } catch (error) {
-    console.error(`Error getting response from ${model}:`, error);
-    return {
-      content: 'Error: Failed to generate response',
-      responseTime: Date.now() - startTime,
-      tokensUsed: 0
-    };
-  }
-}
-
-async function getModelResponseWithContext(messages, model) {
-  const startTime = Date.now();
-  try {
-    let response;
-    if (model === 'llama') {
-      response = await llamaService.generateChatResponse(messages);
-    } else {
-      response = await openaiService.generateChatResponse(messages);
-    }
-    return {
-      content: response.content,
-      responseTime: Date.now() - startTime,
-      tokensUsed: response.tokensUsed || 0
-    };
-  } catch (error) {
-    console.error(`Error getting response from ${model}:`, error);
-    return {
-      content: 'Error: Failed to generate response',
-      responseTime: Date.now() - startTime,
-      tokensUsed: 0
-    };
-  }
-}
-
 module.exports = {
   sendMessage,
-  runFollowUpTest
+  generateQuizFromHistory
 }; 

@@ -10,6 +10,9 @@ require('dotenv').config();
 const app = express();
 const PORT = parseInt(process.env.PORT) || 5001;
 
+// Fix: Trust the first proxy (needed for express-rate-limit and X-Forwarded-For)
+app.set('trust proxy', 1);
+
 let routes;
 try {
   routes = require('./backend/routes');

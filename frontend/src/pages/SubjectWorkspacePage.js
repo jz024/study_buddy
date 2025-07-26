@@ -42,6 +42,7 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import englishService from '../services/subjects/englishService';
 import mathematicsService from '../services/subjects/mathematicsService';
+import QuizDisplay from '../components/QuizDisplay';
 
 const SubjectWorkspacePage = () => {
   const theme = useTheme();
@@ -55,6 +56,8 @@ const SubjectWorkspacePage = () => {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [selectedModel, setSelectedModel] = useState('openai');
   const [error, setError] = useState(null);
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const currentSubject = getSubjectConfig(subjectId);
 
@@ -69,7 +72,6 @@ const SubjectWorkspacePage = () => {
       return;
     }
 
-    // Initialize chat for the current subject
     initializeChat();
   }, [subjectId, currentSubject, currentUser, navigate]);
 
@@ -228,11 +230,10 @@ const SubjectWorkspacePage = () => {
     try {
       let aiResponse;
       if (subjectId === 'english') {
-        aiResponse = await englishService.askQuestion(userQuestion, '', surveyData);
+        aiResponse = await englishService.askQuestion(userQuestion, '', surveyData, selectedModel);
       } else if (subjectId === 'mathematics') {
-        aiResponse = await mathematicsService.askQuestion(userQuestion, '', surveyData);
+        aiResponse = await mathematicsService.askQuestion(userQuestion, '', surveyData, selectedModel);
       } else {
-        // fallback to legacy API for unsupported subjects
         const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
           sender: 'user',
           content: userQuestion
@@ -266,25 +267,33 @@ const SubjectWorkspacePage = () => {
   };
 
   const handleStartQuiz = async () => {
-    if (!currentChatId) return;
+    if (!currentUser || !subjectId) return;
     
     try {
       setIsLoading(true);
       let quizResponse;
-      if (subjectId === 'english') {
-        quizResponse = await englishService.generateQuiz('general topics', 'medium', 10, surveyData);
-      } else if (subjectId === 'mathematics') {
-        quizResponse = await mathematicsService.generateQuiz('general topics', 'medium', 10, surveyData);
+      
+      const response = await axios.post('/api/chat/quiz-from-history', {
+        user_id: currentUser.uid,
+        subject: subjectId,
+        model: selectedModel,
+        questionCount: 10,
+        difficulty: 'medium',
+        userProfile: {
+          age: surveyData?.age || 18,
+          educationLevel: surveyData?.educationLevel || 'High School',
+          learningGoals: surveyData?.learningGoals || ''
+        }
+      });
+      
+      if (response.data.success) {
+        quizResponse = response.data.data.quiz;
+        setCurrentQuiz(quizResponse);
+        setShowQuiz(true);
+        setSelectedFunction(null); // Close the dialog
       } else {
-        const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
-          sender: 'user',
-          content: 'Generate a quiz on general topics with medium difficulty and 10 questions.'
-        });
-        quizResponse = response.data.success ? response.data.aiResponse : 'Quiz generation failed.';
+        setError(response.data.message || 'Failed to generate quiz.');
       }
-      // TODO: Navigate to quiz page or show quiz
-      alert('Quiz generated! (Check console for details)');
-      console.log('Generated quiz:', quizResponse);
     } catch (error) {
       console.error('Failed to generate quiz:', error);
       setError('Failed to generate quiz. Please try again.');
@@ -301,9 +310,9 @@ const SubjectWorkspacePage = () => {
       const sampleContent = `Sample ${currentSubject.name} content for flashcard generation.`;
       let flashcardsResponse;
       if (subjectId === 'english') {
-        flashcardsResponse = await englishService.generateFlashcards(sampleContent, 10, surveyData);
+        flashcardsResponse = await englishService.generateFlashcards(sampleContent, 10, surveyData, selectedModel);
       } else if (subjectId === 'mathematics') {
-        flashcardsResponse = await mathematicsService.generateFlashcards(sampleContent, 10, surveyData);
+        flashcardsResponse = await mathematicsService.generateFlashcards(sampleContent, 10, surveyData, selectedModel);
       } else {
         const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
           sender: 'user',
@@ -311,7 +320,7 @@ const SubjectWorkspacePage = () => {
         });
         flashcardsResponse = response.data.success ? response.data.aiResponse : 'Flashcard generation failed.';
       }
-      // TODO: Navigate to flashcard page or show flashcards
+
       alert('Flashcards generated! (Check console for details)');
       console.log('Generated flashcards:', flashcardsResponse);
     } catch (error) {
@@ -480,6 +489,31 @@ const SubjectWorkspacePage = () => {
                 Ready to test your {currentSubject.name} knowledge? Our AI will generate questions based on your study progress.
               </Typography>
               
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  AI Model:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip
+                    label="OpenAI GPT-3.5"
+                    color={selectedModel === 'openai' ? 'primary' : 'default'}
+                    variant={selectedModel === 'openai' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('openai')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                  <Chip
+                    label="Llama 3.3 70B"
+                    color={selectedModel === 'llama' ? 'primary' : 'default'}
+                    variant={selectedModel === 'llama' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('llama')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  Choose which AI model to generate your quiz
+                </Typography>
+              </Box>
+              
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Paper sx={{ p: 3, borderRadius: 2, bgcolor: alpha(theme.palette.secondary.main, 0.1) }}>
                   <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -488,8 +522,8 @@ const SubjectWorkspacePage = () => {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     • 10 questions per quiz<br/>
-                    • Adaptive difficulty based on your performance<br/>
-                    • Instant feedback and explanations
+                    • Instant feedback and explanations<br/>
+                    • Using {selectedModel === 'openai' ? 'OpenAI GPT-3.5' : 'Llama 3.3 70B'} for generation
                   </Typography>
                 </Paper>
                 
@@ -518,6 +552,31 @@ const SubjectWorkspacePage = () => {
                 Create personalized flashcards from your notes or let AI generate them based on {currentSubject.name} topics.
               </Typography>
               
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  AI Model:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Chip
+                    label="OpenAI GPT-3.5"
+                    color={selectedModel === 'openai' ? 'primary' : 'default'}
+                    variant={selectedModel === 'openai' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('openai')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                  <Chip
+                    label="Llama 3.3 70B"
+                    color={selectedModel === 'llama' ? 'primary' : 'default'}
+                    variant={selectedModel === 'llama' ? 'filled' : 'outlined'}
+                    onClick={() => handleModelChange('llama')}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  Choose which AI model to generate your flashcards
+                </Typography>
+              </Box>
+              
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Paper sx={{ p: 3, borderRadius: 2, bgcolor: alpha('#10B981', 0.1) }}>
                   <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -527,7 +586,8 @@ const SubjectWorkspacePage = () => {
                   <Typography variant="body2" color="text.secondary">
                     • Upload your notes or paste text<br/>
                     • AI will extract key concepts<br/>
-                    • Generate question-answer pairs
+                    • Generate question-answer pairs<br/>
+                    • Using {selectedModel === 'openai' ? 'OpenAI GPT-3.5' : 'Llama 3.3 70B'} for generation
                   </Typography>
                 </Paper>
                 
@@ -626,7 +686,7 @@ const SubjectWorkspacePage = () => {
           <motion.div variants={itemVariants}>
             <Paper sx={{ p: 4, mb: 4, textAlign: 'center', borderRadius: 3 }}>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-                Welcome to {currentSubject.name}, {currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0] || 'Learner'}! 🎯
+                Welcome to {currentSubject.name}, {currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0] || 'Learner'}!
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
                 Choose a learning tool to get started
@@ -670,6 +730,7 @@ const SubjectWorkspacePage = () => {
                     sx={{
                       p: 4,
                       height: '100%',
+                      minHeight: 400,
                       borderRadius: 3,
                       cursor: func.available ? 'pointer' : 'default',
                       transition: 'all 0.3s ease',
@@ -775,6 +836,39 @@ const SubjectWorkspacePage = () => {
       </Container>
 
       {renderFunctionDialog()}
+      <Dialog
+        open={showQuiz}
+        onClose={() => {
+          setShowQuiz(false);
+          setCurrentQuiz(null);
+        }}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            maxHeight: '90vh',
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          {currentQuiz && (
+            <QuizDisplay 
+              quiz={currentQuiz} 
+              onClose={() => {
+                setShowQuiz(false);
+                setCurrentQuiz(null);
+              }}
+              onRetake={() => {
+                setShowQuiz(false);
+                setCurrentQuiz(null);
+                handleStartQuiz();
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

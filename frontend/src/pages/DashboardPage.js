@@ -143,7 +143,7 @@ const DashboardPage = () => {
           <motion.div variants={itemVariants}>
             <Paper sx={{ p: 4, mb: 4, textAlign: 'center', borderRadius: 3 }}>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-                Welcome back, {currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0] || 'Learner'}! 🎉
+                Welcome back, {currentUser?.displayName?.split(' ')[0] || currentUser?.email?.split('@')[0] || 'Learner'}!
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
                 Choose a subject to start your learning journey
