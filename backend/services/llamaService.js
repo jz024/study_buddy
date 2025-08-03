@@ -89,7 +89,7 @@ class LlamaService {
       const response = await this.client.chat.completions.create({
         model: "Meta-Llama-3.3-70B-Instruct",
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
+        temperature: 0.6,
         top_p: 0.1,
         max_tokens: 2000
       });
@@ -111,6 +111,71 @@ class LlamaService {
     } catch (error) {
       console.error('Llama quiz generation error:', error);
       throw new Error('Failed to generate quiz');
+    }
+  }
+
+  async generateFlashcards(content, cardCount = 10, difficulty = 'medium') {
+    try {
+      if (!this.client) {
+        return {
+          title: "Sample Flashcards",
+          cards: [
+            {
+              question: "What is a sample question?",
+              answer: "This is a sample answer with explanation.",
+              category: "Sample Category"
+            }
+          ]
+        };
+      }
+
+      const prompt = content;
+
+      const response = await this.client.chat.completions.create({
+        model: "Meta-Llama-3.3-70B-Instruct",
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.6,
+        top_p: 0.1,
+        max_tokens: 2000
+      });
+
+      let flashcardText = response.choices[0].message.content.trim();
+      if (flashcardText.startsWith('```')) {
+        flashcardText = flashcardText.replace(/^```[a-zA-Z]*\n?/, '');
+        if (flashcardText.endsWith('```')) {
+          flashcardText = flashcardText.slice(0, -3);
+        }
+        flashcardText = flashcardText.trim();
+      }
+      try {
+        const parsedData = JSON.parse(flashcardText);
+        
+        if (parsedData.cards && Array.isArray(parsedData.cards)) {
+          if (parsedData.cards.length < cardCount) {
+            console.log(`Generated ${parsedData.cards.length} cards, need ${cardCount}. Adding placeholder cards.`);
+            const placeholderCards = [];
+            for (let i = parsedData.cards.length; i < cardCount; i++) {
+              placeholderCards.push({
+                question: `Additional question ${i + 1} about the topic?`,
+                answer: `This is an additional answer to help you study the material more thoroughly.`,
+                category: 'Additional'
+              });
+            }
+            parsedData.cards = [...parsedData.cards, ...placeholderCards];
+          } else if (parsedData.cards.length > cardCount) {
+            console.log(`Generated ${parsedData.cards.length} cards, need ${cardCount}. Truncating to ${cardCount}.`);
+            parsedData.cards = parsedData.cards.slice(0, cardCount);
+          }
+        }
+        
+        return parsedData;
+      } catch (parseError) {
+        console.error('Llama flashcard generation returned invalid JSON. Raw response:', flashcardText);
+        throw new Error('Llama flashcard generation failed: invalid JSON returned by model.');
+      }
+    } catch (error) {
+      console.error('Llama flashcard generation error:', error);
+      throw new Error('Failed to generate flashcards');
     }
   }
 }

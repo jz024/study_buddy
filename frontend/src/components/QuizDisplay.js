@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -36,6 +36,17 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRetaking, setIsRetaking] = useState(false);
+
+  useEffect(() => {
+    if (quiz) {
+      setCurrentQuestion(0);
+      setAnswers({});
+      setShowResults(false);
+      setScore(0);
+      setIsRetaking(false);
+    }
+  }, [quiz]);
 
   const handleAnswerSelect = (questionIndex, answer) => {
     setAnswers(prev => ({
@@ -60,12 +71,19 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
     setIsSubmitting(false);
   };
 
-  const handleRetake = () => {
-    setCurrentQuestion(0);
-    setAnswers({});
-    setShowResults(false);
-    setScore(0);
-    if (onRetake) onRetake();
+  const handleRetake = async () => {
+    setIsRetaking(true);
+    try {
+      if (onRetake) {
+        await onRetake();
+      }
+    } catch (error) {
+      console.error('Error retaking quiz:', error);
+      // Show error message to user
+      alert('Failed to generate new quiz. Please try again.');
+    } finally {
+      setIsRetaking(false);
+    }
   };
 
   const getScoreColor = (score) => {
@@ -130,9 +148,38 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
 
   return (
     <Paper sx={{ p: 4, borderRadius: 3, height: '100%', overflow: 'auto', position: 'relative' }}>
+      {/* Loading Overlay for Retake */}
+      {isRetaking && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
+            borderRadius: 3
+          }}
+        >
+          <CircularProgress size={60} sx={{ mb: 2 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+            Generating New Quiz...
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', maxWidth: 300 }}>
+            Creating a fresh set of questions based on your study session. This may take a few moments.
+          </Typography>
+        </Box>
+      )}
+
       {/* Close Button */}
       <IconButton
         onClick={onClose}
+        disabled={isRetaking}
         sx={{
           position: 'absolute',
           top: 16,
@@ -210,7 +257,7 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
                     <FormControlLabel
                       key={index}
                       value={option}
-                      control={<Radio />}
+                      control={<Radio disabled={isRetaking} />}
                       label={option}
                       sx={{
                         mb: 1,
@@ -218,8 +265,9 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
                         borderRadius: 2,
                         border: `1px solid ${alpha(theme.palette.grey[300], 0.5)}`,
                         '&:hover': {
-                          bgcolor: alpha(theme.palette.primary.main, 0.05)
-                        }
+                          bgcolor: isRetaking ? 'transparent' : alpha(theme.palette.primary.main, 0.05)
+                        },
+                        opacity: isRetaking ? 0.6 : 1
                       }}
                     />
                   ))}
@@ -232,7 +280,7 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
               <Button
                 variant="outlined"
                 onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}
-                disabled={currentQuestion === 0}
+                disabled={currentQuestion === 0 || isRetaking}
                 sx={{ borderRadius: 2 }}
               >
                 Previous
@@ -242,7 +290,7 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
                 <Button
                   variant="contained"
                   onClick={handleSubmitQuiz}
-                  disabled={isSubmitting || Object.keys(answers).length < quiz.questions.length}
+                  disabled={isSubmitting || Object.keys(answers).length < quiz.questions.length || isRetaking}
                   startIcon={isSubmitting ? <CircularProgress size={20} /> : <PlayArrow />}
                   sx={{ borderRadius: 2 }}
                 >
@@ -252,7 +300,7 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
                 <Button
                   variant="contained"
                   onClick={() => setCurrentQuestion(prev => prev + 1)}
-                  disabled={!answers[currentQuestion]}
+                  disabled={!answers[currentQuestion] || isRetaking}
                   sx={{ borderRadius: 2 }}
                 >
                   Next
@@ -300,7 +348,6 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
             </Typography>
             
             {quiz.questions.map((question, index) => {
-              // Safety check for question structure
               const isQuestionTrueFalse = question.type === 'true-false';
               const isQuestionMultipleChoice = question.options && Array.isArray(question.options);
               
@@ -324,7 +371,6 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
                 );
               }
               
-              // Get options for display
               const reviewOptions = isQuestionTrueFalse ? ['True', 'False'] : question.options;
               
               return (
@@ -396,14 +442,16 @@ const QuizDisplay = ({ quiz, onClose, onRetake }) => {
               <Button
                 variant="contained"
                 onClick={handleRetake}
-                startIcon={<Refresh />}
+                startIcon={isRetaking ? <CircularProgress size={20} /> : <Refresh />}
+                disabled={isRetaking}
                 sx={{ borderRadius: 2 }}
               >
-                Retake Quiz
+                {isRetaking ? 'Retaking...' : 'Retake Quiz'}
               </Button>
               <Button
                 variant="outlined"
                 onClick={onClose}
+                disabled={isRetaking}
                 sx={{ borderRadius: 2 }}
               >
                 Close

@@ -43,6 +43,7 @@ import axios from 'axios';
 import englishService from '../services/subjects/englishService';
 import mathematicsService from '../services/subjects/mathematicsService';
 import QuizDisplay from '../components/QuizDisplay';
+import FlashcardDisplay from '../components/FlashcardDisplay';
 
 const SubjectWorkspacePage = () => {
   const theme = useTheme();
@@ -58,6 +59,8 @@ const SubjectWorkspacePage = () => {
   const [error, setError] = useState(null);
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [currentFlashcards, setCurrentFlashcards] = useState(null);
+  const [showFlashcards, setShowFlashcards] = useState(false);
 
   const currentSubject = getSubjectConfig(subjectId);
 
@@ -289,40 +292,50 @@ const SubjectWorkspacePage = () => {
       if (response.data.success) {
         quizResponse = response.data.data.quiz;
         setCurrentQuiz(quizResponse);
-        setShowQuiz(true);
-        setSelectedFunction(null); // Close the dialog
+        if (!showQuiz) {
+          setShowQuiz(true);
+        }
+        setSelectedFunction(null);
       } else {
         setError(response.data.message || 'Failed to generate quiz.');
       }
     } catch (error) {
       console.error('Failed to generate quiz:', error);
       setError('Failed to generate quiz. Please try again.');
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGenerateFlashcards = async () => {
-    if (!currentChatId) return;
+    if (!currentUser || !subjectId) return;
     
     try {
       setIsLoading(true);
-      const sampleContent = `Sample ${currentSubject.name} content for flashcard generation.`;
-      let flashcardsResponse;
-      if (subjectId === 'english') {
-        flashcardsResponse = await englishService.generateFlashcards(sampleContent, 10, surveyData, selectedModel);
-      } else if (subjectId === 'mathematics') {
-        flashcardsResponse = await mathematicsService.generateFlashcards(sampleContent, 10, surveyData, selectedModel);
+      let flashcardResponse;
+      
+      const response = await axios.post('/api/chat/flashcards-from-history', {
+        user_id: currentUser.uid,
+        subject: subjectId,
+        model: selectedModel,
+        cardCount: 10,
+        difficulty: 'medium',
+        userProfile: {
+          age: surveyData?.age || 18,
+          educationLevel: surveyData?.educationLevel || 'High School',
+          learningGoals: surveyData?.learningGoals || ''
+        }
+      });
+      
+      if (response.data.success) {
+        flashcardResponse = response.data.data.flashcards;
+        setCurrentFlashcards(flashcardResponse);
+        setShowFlashcards(true);
+        setSelectedFunction(null);
       } else {
-        const response = await axios.post(`/api/chats/${currentChatId}/messages`, {
-          sender: 'user',
-          content: `Generate 10 flashcards from this content: "${sampleContent}". Each flashcard should be a question-answer pair.`
-        });
-        flashcardsResponse = response.data.success ? response.data.aiResponse : 'Flashcard generation failed.';
+        setError(response.data.message || 'Failed to generate flashcards.');
       }
-
-      alert('Flashcards generated! (Check console for details)');
-      console.log('Generated flashcards:', flashcardsResponse);
     } catch (error) {
       console.error('Failed to generate flashcards:', error);
       setError('Failed to generate flashcards. Please try again.');
@@ -549,7 +562,7 @@ const SubjectWorkspacePage = () => {
           {selectedFunction.id === 'generate-flashcards' && (
             <Box>
               <Typography variant="body1" sx={{ mb: 3 }}>
-                Create personalized flashcards from your notes or let AI generate them based on {currentSubject.name} topics.
+                Create personalized flashcards or let AI generate them based on {currentSubject.name} topics.
               </Typography>
               
               <Box sx={{ mb: 3 }}>
@@ -584,7 +597,6 @@ const SubjectWorkspacePage = () => {
                     Create New Set
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    • Upload your notes or paste text<br/>
                     • AI will extract key concepts<br/>
                     • Generate question-answer pairs<br/>
                     • Using {selectedModel === 'openai' ? 'OpenAI GPT-3.5' : 'Llama 3.3 70B'} for generation
@@ -860,10 +872,42 @@ const SubjectWorkspacePage = () => {
                 setShowQuiz(false);
                 setCurrentQuiz(null);
               }}
-              onRetake={() => {
-                setShowQuiz(false);
-                setCurrentQuiz(null);
-                handleStartQuiz();
+              onRetake={async () => {
+                // Don't close the dialog immediately - let QuizDisplay handle the loading state
+                await handleStartQuiz();
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={showFlashcards}
+        onClose={() => {
+          setShowFlashcards(false);
+          setCurrentFlashcards(null);
+        }}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            maxHeight: '90vh',
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          {currentFlashcards && (
+            <FlashcardDisplay 
+              flashcards={currentFlashcards} 
+              onClose={() => {
+                setShowFlashcards(false);
+                setCurrentFlashcards(null);
+              }}
+              onRegenerate={async () => {
+                // Don't close the dialog immediately - let FlashcardDisplay handle the loading state
+                await handleGenerateFlashcards();
               }}
             />
           )}

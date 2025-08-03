@@ -1,14 +1,5 @@
 const speech = require('@google-cloud/speech');
 
-let audioConversionService;
-try {
-  audioConversionService = require('./audioConversionService');
-  console.log('Audio conversion service loaded successfully');
-} catch (error) {
-  console.log('Audio conversion service not available:', error.message);
-  audioConversionService = null;
-}
-
 class SpeechToTextService {
   constructor() {
     this.client = new speech.SpeechClient({
